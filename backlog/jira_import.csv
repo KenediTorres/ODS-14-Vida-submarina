@@ -1,0 +1,19 @@
+Summary,Type,Priority,Assignee,Status,Description
+Diseñar esquema de base de datos PostgreSQL,Story,High,,To Do,Crear el esquema principal de la base de datos con PostgreSQL 16 y PostGIS
+Implementar geolocalización con PostGIS,Story,High,,To Do,Integrar PostGIS para capturar y consultar ubicaciones de desembarque
+Crear diccionario de datos,Task,Medium,,To Do,Documentar todas las tablas y campos de la base de datos
+Diseñar prototipos de UI/UX,Story,High,,To Do,Crear diseños visuales para la aplicación web y móvil
+Crear aplicación web,Story,High,,To Do,Desarrollar la interfaz web del sistema SIRDEPA
+Crear aplicación móvil,Story,Medium,,To Do,Desarrollar la aplicación móvil para registro en campo
+Crear registro de desembarque,Story,High,,To Do,Implementar funcionalidad para registrar desembarques
+Leer/Consultar registros,Story,High,,To Do,Implementar búsqueda y consulta de registros históricos
+Actualizar información,Story,Medium,,To Do,Permitir editar registros de desembarque
+Eliminar registros,Story,Medium,,To Do,Implementar eliminación con auditoría de registros
+Reportes por período,Story,High,,To Do,Generar reportes de desembarques por período temporal
+Estadísticas por especie,Story,Medium,,To Do,Crear gráficos y análisis por especie
+Análisis por zona de pesca,Story,Medium,,To Do,Análisis de desembarques por zona geográfica
+Exportar a Excel/PDF,Story,Medium,,To Do,Permitir exportación de reportes en múltiples formatos
+Implementar autenticación de usuarios,Story,High,,To Do,Sistema de login y sesiones
+Gestión de roles y permisos,Story,High,,To Do,Control de acceso por rol de usuario
+Auditoría de cambios,Story,Medium,,To Do,Registro de todas las modificaciones del sistema
+Encriptación de datos,Story,High,,To Do,Implementar encriptación de información sensible
