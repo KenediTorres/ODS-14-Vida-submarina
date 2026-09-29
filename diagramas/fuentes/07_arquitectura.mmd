@@ -1,0 +1,25 @@
+---
+title: Arquitectura N-capas cliente-servidor - SIRDEPA
+---
+flowchart TB
+    subgraph Presentacion["Capa de presentación"]
+        WEB["Aplicación web responsiva<br/>HTML · CSS · JavaScript"]
+        MOV["App móvil de campo<br/>modo offline + sync batch"]
+    end
+    subgraph Logica["Capa lógica (API RESTful)"]
+        API["Back-end Node.js o Python (Flask/Django)"]
+        VAL["Motor de validación<br/>zonas, tallas, vedas, permisos"]
+        ALR["Servicio de alertas<br/>y notificaciones"]
+        TRZ["Servicio de trazabilidad / QR"]
+        REP["Reportes y dashboards"]
+    end
+    subgraph Datos["Capa de datos"]
+        DB[("PostgreSQL 16 + PostGIS")]
+        OBJ[("Almacenamiento de fotos")]
+    end
+    GPS["Dispositivo GPS / sensores"] -- "HTTPS" --> API
+    WEB -- "HTTPS / JSON" --> API
+    MOV -- "HTTPS / JSON" --> API
+    API --> VAL & ALR & TRZ & REP
+    VAL & ALR & TRZ & REP --> DB
+    API --> OBJ

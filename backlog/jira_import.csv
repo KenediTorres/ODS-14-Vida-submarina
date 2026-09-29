@@ -1,19 +1,137 @@
-Summary,Type,Priority,Assignee,Status,Description
-Diseñar esquema de base de datos PostgreSQL,Story,High,,To Do,Crear el esquema principal de la base de datos con PostgreSQL 16 y PostGIS
-Implementar geolocalización con PostGIS,Story,High,,To Do,Integrar PostGIS para capturar y consultar ubicaciones de desembarque
-Crear diccionario de datos,Task,Medium,,To Do,Documentar todas las tablas y campos de la base de datos
-Diseñar prototipos de UI/UX,Story,High,,To Do,Crear diseños visuales para la aplicación web y móvil
-Crear aplicación web,Story,High,,To Do,Desarrollar la interfaz web del sistema SIRDEPA
-Crear aplicación móvil,Story,Medium,,To Do,Desarrollar la aplicación móvil para registro en campo
-Crear registro de desembarque,Story,High,,To Do,Implementar funcionalidad para registrar desembarques
-Leer/Consultar registros,Story,High,,To Do,Implementar búsqueda y consulta de registros históricos
-Actualizar información,Story,Medium,,To Do,Permitir editar registros de desembarque
-Eliminar registros,Story,Medium,,To Do,Implementar eliminación con auditoría de registros
-Reportes por período,Story,High,,To Do,Generar reportes de desembarques por período temporal
-Estadísticas por especie,Story,Medium,,To Do,Crear gráficos y análisis por especie
-Análisis por zona de pesca,Story,Medium,,To Do,Análisis de desembarques por zona geográfica
-Exportar a Excel/PDF,Story,Medium,,To Do,Permitir exportación de reportes en múltiples formatos
-Implementar autenticación de usuarios,Story,High,,To Do,Sistema de login y sesiones
-Gestión de roles y permisos,Story,High,,To Do,Control de acceso por rol de usuario
-Auditoría de cambios,Story,Medium,,To Do,Registro de todas las modificaciones del sistema
-Encriptación de datos,Story,High,,To Do,Implementar encriptación de información sensible
+Issue ID,Parent ID,Issue Type,Summary,Epic Name,Description,Priority,Status,Sprint,Story Points,Labels,Labels,Labels
+EP01,,Epic,Gestión de flota pesquera,Gestión de flota pesquera,"Registro de embarcaciones y pescadores, y monitoreo satelital de su posición.",High,To Do,,,sirdepa,ods14,
+EP02,,Epic,Actividades pesqueras,Actividades pesqueras,"Bitácora digital de capturas, evidencia fotográfica y trazabilidad por lote/QR.",High,To Do,,,sirdepa,ods14,
+EP03,,Epic,Gestión normativa,Gestión normativa,"Zonas, vedas, tallas mínimas, cuotas y permisos, con alertas automáticas de incumplimiento.",High,To Do,,,sirdepa,ods14,
+EP04,,Epic,Inteligencia pesquera,Inteligencia pesquera,"Reportes, dashboards y verificación pública de trazabilidad para la toma de decisiones.",High,To Do,,,sirdepa,ods14,
+EP05,,Epic,Gestión medioambiental,Gestión medioambiental,Datos oceanográficos/meteorológicos e indicadores de sostenibilidad del recurso.,High,To Do,,,sirdepa,ods14,
+EP06,,Epic,Plataforma y seguridad,Plataforma y seguridad,"Base de datos, aplicaciones, autenticación, roles, auditoría y cifrado (habilitadores técnicos).",High,To Do,,,sirdepa,ods14,
+HU01,EP01,Story,"HU01 - Registrar mi embarcación con matrícula, tipo, eslora y capacidad de bodega",,"Como armador, quiero registrar mi embarcación con matrícula, tipo, eslora y capacidad de bodega, para que quede habilitada para operar y ser monitoreada.
+
+Criterios de aceptación:
+- La matrícula es única y obligatoria
+- Se asocia a un pescador propietario existente
+- Queda en estado ACTIVA y se registra en auditoría
+
+Requerimientos: RF01.3, RD01",Highest,To Do,SIRDEPA Sprint 1,5,sirdepa,sprint1,
+HU02,EP01,Story,"HU02 - Registrar pescadores con su DNI, comunidad y contacto",,"Como administrador, quiero registrar pescadores con su DNI, comunidad y contacto, para vincularlos como propietarios o tripulantes de embarcaciones.
+
+Criterios de aceptación:
+- El documento es único
+- Se puede vincular a un usuario del sistema
+- Se valida el formato del DNI (8 dígitos)
+
+Requerimientos: RD01",High,To Do,SIRDEPA Sprint 1,3,sirdepa,sprint1,
+HU03,EP01,Story,HU03 - Recibir la posición GPS de cada embarcación cada 15 minutos,,"Como fiscalizador de PRODUCE, quiero recibir la posición GPS de cada embarcación cada 15 minutos, para conocer en todo momento dónde se está pescando.
+
+Criterios de aceptación:
+- Se almacena fecha, latitud, longitud, velocidad y rumbo
+- Se aceptan envíos en lote cuando no hay señal (sync batch)
+- No se duplican posiciones para la misma embarcación y hora
+- La última posición se consulta en menos de 3 s
+
+Requerimientos: RF01.1, RNF 01.1",Highest,To Do,SIRDEPA Sprint 1,8,sirdepa,sprint1,
+HU04,EP02,Story,"HU04 - Registrar mi captura en una bitácora digital indicando especie, kg y talla promedio",,"Como pescador artesanal, quiero registrar mi captura en una bitácora digital indicando especie, kg y talla promedio, para cumplir con la declaración sin trámites en papel.
+
+Criterios de aceptación:
+- Una captura puede tener varias especies
+- El total en kg se calcula automáticamente
+- Funciona desde el celular y guarda offline hasta tener señal
+- El registro toma menos de 2 minutos
+
+Requerimientos: RF01.3, RD09",Highest,To Do,SIRDEPA Sprint 1,8,sirdepa,sprint1,
+HU05,EP02,Story,HU05 - Adjuntar fotos de mi captura,,"Como pescador artesanal, quiero adjuntar fotos de mi captura, para tener evidencia que respalde lo declarado.
+
+Criterios de aceptación:
+- Se aceptan fotos JPG/PNG de hasta 5 MB
+- Se guarda el hash SHA-256 para garantizar integridad
+- Se puede adjuntar más de una foto por captura
+
+Requerimientos: RF01.4",Medium,To Do,SIRDEPA Sprint 1,3,sirdepa,sprint1,
+HU06,EP02,Story,HU06 - Que se genere un código QR único por lote de captura,,"Como armador, quiero que se genere un código QR único por lote de captura, para certificar el origen legal del producto ante compradores.
+
+Criterios de aceptación:
+- El QR contiene un UUID único
+- Solo se genera si la captura pasó la validación
+- El QR se puede descargar e imprimir
+
+Requerimientos: RF01.5",High,To Do,SIRDEPA Sprint 1,5,sirdepa,sprint1,
+HU07,EP03,Story,HU07 - Definir zonas restringidas y reservas marinas como polígonos en el mapa,,"Como analista de PRODUCE, quiero definir zonas restringidas y reservas marinas como polígonos en el mapa, para que el sistema detecte ingresos no autorizados.
+
+Criterios de aceptación:
+- Las zonas tienen tipo, norma legal y vigencia
+- Se pueden cargar polígonos en formato GeoJSON
+- Una zona vencida deja de generar alertas
+
+Requerimientos: RF01.2, RD01",Highest,To Do,SIRDEPA Sprint 2,5,sirdepa,sprint2,
+HU08,EP03,Story,"HU08 - Registrar vedas, tallas mínimas y cuotas por especie",,"Como investigador de IMARPE, quiero registrar vedas, tallas mínimas y cuotas por especie, para que las capturas se validen contra la normativa vigente.
+
+Criterios de aceptación:
+- Una veda tiene especie, fechas y opcionalmente zona
+- Cada especie tiene talla mínima y cuota anual
+- Los cambios quedan en auditoría
+
+Requerimientos: RD01, RD17",High,To Do,SIRDEPA Sprint 2,5,sirdepa,sprint2,
+HU09,EP03,Story,HU09 - Gestionar los permisos de pesca de cada embarcación y las especies autorizadas,,"Como fiscalizador de PRODUCE, quiero gestionar los permisos de pesca de cada embarcación y las especies autorizadas, para saber quién puede pescar qué y hasta cuándo.
+
+Criterios de aceptación:
+- El número de resolución es único
+- El permiso indica especies autorizadas
+- Una captura sin permiso vigente genera alerta CRÍTICA
+
+Requerimientos: RD01",High,To Do,SIRDEPA Sprint 2,5,sirdepa,sprint2,
+HU10,EP03,Story,"HU10 - Recibir alertas automáticas de ingreso a zona restringida, talla menor, veda o permiso vencido",,"Como inspector, quiero recibir alertas automáticas de ingreso a zona restringida, talla menor, veda o permiso vencido, para actuar rápido ante pesca ilegal.
+
+Criterios de aceptación:
+- Cada alerta tiene tipo, gravedad y estado de atención
+- Se notifica a IMARPE, PRODUCE y al usuario involucrado
+- El inspector puede marcarla como atendida o descartada
+
+Requerimientos: RF01.2, RF01.7",Highest,To Do,SIRDEPA Sprint 2,8,sirdepa,sprint2,
+HU11,EP04,Story,"HU11 - Ver un dashboard con desembarques por período, especie y zona",,"Como analista de IMARPE, quiero ver un dashboard con desembarques por período, especie y zona, para tomar decisiones sobre vedas y cuotas con datos en tiempo real.
+
+Criterios de aceptación:
+- Filtros por rango de fechas, especie y zona
+- Muestra avance de cuota por especie
+- Muestra alertas pendientes por gravedad
+
+Requerimientos: RD17",High,To Do,SIRDEPA Sprint 2,8,sirdepa,sprint2,
+HU12,EP04,Story,HU12 - Exportar los reportes a Excel y PDF,,"Como analista de IMARPE, quiero exportar los reportes a Excel y PDF, para compartirlos en informes oficiales.
+
+Criterios de aceptación:
+- El Excel conserva los filtros aplicados
+- El PDF incluye fecha de generación y usuario
+
+Requerimientos: RD17",Medium,To Do,SIRDEPA Sprint 2,3,sirdepa,sprint2,
+HU13,EP04,Story,HU13 - Escanear el QR de un lote y ver su origen,,"Como consumidor o comprador, quiero escanear el QR de un lote y ver su origen, para comprobar que el producto proviene de pesca legal.
+
+Criterios de aceptación:
+- La consulta no requiere iniciar sesión
+- Muestra embarcación, fecha, lugar, especie y si cumple talla
+- No expone datos personales del pescador
+
+Requerimientos: RF01.5",Medium,To Do,SIRDEPA Sprint 2,3,sirdepa,sprint2,
+HU14,EP05,Story,"HU14 - Registrar lecturas de sensores (temperatura del agua, oleaje, viento)",,"Como investigador de IMARPE, quiero registrar lecturas de sensores (temperatura del agua, oleaje, viento), para relacionar las capturas con las condiciones del mar.
+
+Criterios de aceptación:
+- Cada lectura tiene tipo, valor, unidad y hora
+- Se generan alertas meteorológicas por umbral
+
+Requerimientos: RF01.6",Medium,To Do,SIRDEPA Sprint 2,5,sirdepa,sprint2,
+HU15,EP05,Story,"HU15 - Consultar indicadores de sostenibilidad (porcentaje de juveniles, avance de cuota)",,"Como organización ambiental, quiero consultar indicadores de sostenibilidad (porcentaje de juveniles, avance de cuota), para evaluar la salud del recurso.
+
+Criterios de aceptación:
+- Se muestra el porcentaje de capturas bajo talla mínima por especie
+- Se muestra el avance de cuota anual
+- Los datos son agregados y anónimos
+
+Requerimientos: RD17",Medium,To Do,SIRDEPA Sprint 2,5,sirdepa,sprint2,
+T01,EP06,Task,T01 - Diseñar esquema de base de datos PostgreSQL,,Crear el esquema principal con PostgreSQL 16 y PostGIS (base-de-datos/sirdepa_schema.sql),High,To Do,SIRDEPA Sprint 1,5,sirdepa,tecnico,sprint1
+T02,EP06,Task,T02 - Implementar geolocalización con PostGIS,,Integrar PostGIS para capturar y consultar ubicaciones y zonas,High,To Do,SIRDEPA Sprint 1,3,sirdepa,tecnico,sprint1
+T03,EP06,Task,T03 - Crear diccionario de datos,,Documentar todas las tablas y campos (base-de-datos/diccionario_datos.json),Medium,To Do,SIRDEPA Sprint 1,2,sirdepa,tecnico,sprint1
+T04,EP06,Task,T04 - Diseñar prototipos de UI/UX,,Crear diseños visuales para la aplicación web y móvil (docs/prototipos),High,To Do,SIRDEPA Sprint 1,5,sirdepa,tecnico,sprint1
+T05,EP06,Task,T05 - Crear aplicación web,,Desarrollar la interfaz web responsiva del sistema SIRDEPA,High,To Do,SIRDEPA Sprint 1,8,sirdepa,tecnico,sprint1
+T06,EP06,Task,T06 - Crear aplicación móvil,,Desarrollar la aplicación móvil para registro en campo con modo offline,Medium,To Do,SIRDEPA Sprint 2,8,sirdepa,tecnico,sprint2
+T07,EP06,Task,T07 - Implementar autenticación de usuarios,,"Login, sesiones y autenticación de dos factores para usuarios críticos (RNF 01.2)",High,To Do,SIRDEPA Sprint 1,5,sirdepa,tecnico,sprint1
+T08,EP06,Task,T08 - Gestión de roles y permisos,,"Control de acceso por rol: ADMIN, IMARPE, PRODUCE, INSPECTOR, ARMADOR, PESCADOR",High,To Do,SIRDEPA Sprint 1,3,sirdepa,tecnico,sprint1
+T09,EP06,Task,T09 - Auditoría de cambios,,Registro de todas las modificaciones en tablas críticas,Medium,To Do,SIRDEPA Sprint 2,3,sirdepa,tecnico,sprint2
+T10,EP06,Task,T10 - Encriptación de datos,,Cifrado en tránsito (HTTPS) y de información sensible en reposo,High,To Do,SIRDEPA Sprint 2,3,sirdepa,tecnico,sprint2

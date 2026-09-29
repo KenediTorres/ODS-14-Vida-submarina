@@ -1,0 +1,29 @@
+---
+title: Diagrama de secuencia - Envío de datos y validación
+---
+sequenceDiagram
+    autonumber
+    participant E as Embarcación
+    participant S as SistemaMonitoreo
+    participant BD as Base de datos
+    participant I as IMARPE
+    participant P as PRODUCE
+
+    E->>S: Datos GPS (cada 15 min)
+    activate S
+    S->>BD: Validar zona / permiso
+    BD-->>S: Respuesta
+    alt Irregularidad detectada
+        S-)I: Alerta
+        S-)P: Alerta
+    end
+    deactivate S
+    E->>S: Bitácora + fotos
+    activate S
+    S->>BD: Guardar captura
+    BD-->>S: Confirmación
+    S->>BD: Registrar lote (QR generado)
+    S-->>E: Notificación + código QR
+    deactivate S
+    S->>I: Reporte periódico
+    S->>P: Reporte periódico

@@ -1,0 +1,306 @@
+// =====================================================================
+//  SIRDEPA - Sistema de Registro de Desembarque Pesquero Artesanal
+//  Proyecto "Vida Submarina" (ODS 14)
+//  Pegar en https://dbdiagram.io para visualizar el modelo.
+//  Fuente de verdad ejecutable: sirdepa_schema.sql (PostgreSQL 16 + PostGIS)
+// =====================================================================
+
+Project SIRDEPA {
+  database_type: 'PostgreSQL'
+  Note: 'Modelo de datos del sistema de monitoreo y registro de desembarque pesquero artesanal (ODS 14 - Vida Submarina).'
+}
+
+Enum rol_usuario {
+  ADMIN
+  IMARPE
+  PRODUCE
+  INSPECTOR
+  ARMADOR
+  PESCADOR
+  INVESTIGADOR
+}
+
+Enum tipo_embarcacion {
+  ARTESANAL
+  MENOR_ESCALA
+  MAYOR_ESCALA
+}
+
+Enum estado_embarcacion {
+  ACTIVA
+  EN_PUERTO
+  SUSPENDIDA
+  BAJA
+}
+
+Enum tipo_zona {
+  PERMITIDA
+  RESTRINGIDA
+  RESERVA_MARINA
+  VEDA_ESPACIAL
+}
+
+Enum estado_permiso {
+  VIGENTE
+  VENCIDO
+  SUSPENDIDO
+  REVOCADO
+}
+
+Enum estado_validacion {
+  PENDIENTE
+  CONFORME
+  OBSERVADA
+}
+
+Enum estado_lote {
+  GENERADO
+  EN_TRANSITO
+  COMERCIALIZADO
+  OBSERVADO
+}
+
+Enum tipo_alerta {
+  ZONA_RESTRINGIDA
+  TALLA_MINIMA
+  VEDA
+  CUOTA_EXCEDIDA
+  PERMISO_VENCIDO
+  SIN_SENAL_GPS
+  METEOROLOGICA
+}
+
+Enum nivel_gravedad {
+  BAJA
+  MEDIA
+  ALTA
+  CRITICA
+}
+
+Enum estado_atencion {
+  PENDIENTE
+  EN_REVISION
+  ATENDIDA
+  DESCARTADA
+}
+
+TableGroup actores {
+  usuario
+  pescador
+  embarcacion
+}
+
+TableGroup normativa {
+  zona
+  especie
+  veda
+  permiso
+  permiso_especie
+}
+
+TableGroup operacion {
+  localizacion
+  posicion_gps
+  sensor_registro
+  captura
+  detalle_captura
+  evidencia_foto
+}
+
+TableGroup trazabilidad_control {
+  lote
+  alerta
+  auditoria
+}
+
+Table usuario {
+  id_usr int [pk, increment]
+  nombre varchar(120) [not null]
+  email varchar(150) [not null, unique]
+  password_hash varchar(255) [not null]
+  rol rol_usuario [not null]
+  auth_2fa boolean [not null, default: false, note: 'Obligatorio para ADMIN, IMARPE, PRODUCE, INSPECTOR (RNF 01.2)']
+  activo boolean [not null, default: true]
+  creado_en timestamptz [not null, default: `now()`]
+}
+
+Table pescador {
+  id_pesc int [pk, increment]
+  id_usr int [unique, ref: - usuario.id_usr]
+  nombre varchar(120) [not null]
+  tipo_documento varchar(10) [not null, default: 'DNI']
+  documento varchar(15) [not null, unique]
+  comunidad varchar(120)
+  contacto varchar(60)
+  creado_en timestamptz [not null, default: `now()`]
+}
+
+Table embarcacion {
+  id_emb int [pk, increment]
+  matricula varchar(20) [not null, unique]
+  nombre varchar(100) [not null]
+  tipo tipo_embarcacion [not null, default: 'ARTESANAL']
+  eslora_m numeric(5,2)
+  capacidad_bodega_m3 numeric(7,2)
+  estado estado_embarcacion [not null, default: 'ACTIVA']
+  owner_id int [not null, ref: > pescador.id_pesc, note: 'Pescador 0..* posee Embarcación']
+  creado_en timestamptz [not null, default: `now()`]
+  indexes {
+    owner_id
+  }
+}
+
+Table zona {
+  id_zona int [pk, increment]
+  nombre varchar(120) [not null]
+  tipo tipo_zona [not null]
+  norma_legal varchar(120)
+  vigente_desde date [not null, default: `current_date`]
+  vigente_hasta date
+  geom "geometry(MultiPolygon,4326)" [not null, note: 'Índice GIST']
+}
+
+Table especie {
+  id_esp int [pk, increment]
+  nombre_cientifico varchar(120) [not null, unique]
+  nombre_comun varchar(80) [not null]
+  talla_minima_cm numeric(6,2)
+  cuota_anual_t numeric(12,2)
+}
+
+Table veda {
+  id_veda int [pk, increment]
+  id_esp int [not null, ref: > especie.id_esp]
+  id_zona int [ref: > zona.id_zona, note: 'NULL = todo el litoral']
+  fecha_inicio date [not null]
+  fecha_fin date [not null]
+  norma_legal varchar(120)
+}
+
+Table permiso {
+  id_perm int [pk, increment]
+  id_emb int [not null, ref: > embarcacion.id_emb, note: 'Embarcación 1..* tiene Permiso']
+  gestionado_por int [ref: > usuario.id_usr, note: 'Usuario 1..* gestiona Permiso']
+  tipo_permiso varchar(60) [not null]
+  numero_resolucion varchar(60) [not null, unique]
+  fecha_inicio date [not null]
+  fecha_fin date [not null]
+  estado estado_permiso [not null, default: 'VIGENTE']
+}
+
+Table permiso_especie {
+  id_perm int [pk, ref: > permiso.id_perm]
+  id_esp int [pk, ref: > especie.id_esp]
+  Note: 'Permiso N..* contiene Especie'
+}
+
+Table localizacion {
+  id_loc int [pk, increment]
+  nombre varchar(120) [not null]
+  latitud numeric(9,6) [not null]
+  longitud numeric(9,6) [not null]
+  geom "geometry(Point,4326)" [note: 'Columna generada desde latitud/longitud']
+  id_zona int [ref: > zona.id_zona]
+}
+
+Table posicion_gps {
+  id_pos bigint [pk, increment]
+  id_emb int [not null, ref: > embarcacion.id_emb]
+  fecha_hora timestamptz [not null]
+  latitud numeric(9,6) [not null]
+  longitud numeric(9,6) [not null]
+  geom "geometry(Point,4326)" [note: 'Columna generada']
+  velocidad_nudos numeric(5,2)
+  rumbo_grados numeric(5,2)
+  en_zona_permitida boolean [not null, default: true, note: 'Actualizado por trigger fn_validar_zona_gps']
+  recibido_en timestamptz [not null, default: `now()`]
+  indexes {
+    (id_emb, fecha_hora) [unique]
+  }
+  Note: 'MonitoreoGPS - RF01.1 registro cada 15 minutos'
+}
+
+Table sensor_registro {
+  id_reg bigint [pk, increment]
+  id_emb int [not null, ref: > embarcacion.id_emb, note: 'SensorRegistro N..* de Embarcación']
+  ts timestamptz [not null]
+  latitud numeric(9,6)
+  longitud numeric(9,6)
+  tipo_sensor varchar(40) [not null]
+  valor numeric(10,3) [not null]
+  unidad varchar(15) [not null]
+  Note: 'RF01.6 monitoreo de condiciones meteorológicas y oceanográficas'
+}
+
+Table lote {
+  id_lote int [pk, increment]
+  codigo_qr uuid [not null, unique, default: `gen_random_uuid()`]
+  fecha_creacion timestamptz [not null, default: `now()`]
+  estado_trazabilidad estado_lote [not null, default: 'GENERADO']
+  destino varchar(150)
+  Note: 'RF01.5 código QR único por lote'
+}
+
+Table captura {
+  id_capt int [pk, increment]
+  id_emb int [not null, ref: > embarcacion.id_emb, note: 'Embarcación 1..* tiene Captura']
+  id_lote int [ref: > lote.id_lote, note: 'Captura N..1 pertenece a Lote']
+  id_loc int [ref: > localizacion.id_loc, note: 'Captura 1 registra Localización']
+  registrado_por int [ref: > usuario.id_usr]
+  fecha_hora timestamptz [not null]
+  total_kg numeric(12,2) [not null, default: 0, note: 'Recalculado por trigger']
+  temperatura_agua_c numeric(4,1)
+  arte_pesca varchar(60)
+  estado_validacion estado_validacion [not null, default: 'PENDIENTE']
+  observaciones text
+  creado_en timestamptz [not null, default: `now()`]
+  Note: 'Bitácora digital - RF01.3'
+}
+
+Table detalle_captura {
+  id_det int [pk, increment]
+  id_capt int [not null, ref: > captura.id_capt]
+  id_esp int [not null, ref: > especie.id_esp]
+  cantidad_kg numeric(12,2) [not null]
+  cantidad_unidades int
+  talla_promedio_cm numeric(6,2)
+  cumple_talla_minima boolean [note: 'Calculado por trigger fn_validar_detalle']
+  indexes {
+    (id_capt, id_esp) [unique]
+  }
+}
+
+Table evidencia_foto {
+  id_foto int [pk, increment]
+  id_capt int [not null, ref: > captura.id_capt]
+  url text [not null]
+  hash_sha256 char(64) [not null]
+  tomada_en timestamptz [not null, default: `now()`]
+  Note: 'RF01.4 fotos digitales como evidencia'
+}
+
+Table alerta {
+  id_alerta int [pk, increment]
+  id_emb int [not null, ref: > embarcacion.id_emb]
+  id_pos bigint [ref: > posicion_gps.id_pos]
+  id_capt int [ref: > captura.id_capt]
+  tipo_alerta tipo_alerta [not null]
+  descripcion text [not null]
+  nivel_gravedad nivel_gravedad [not null, default: 'MEDIA']
+  estado_atencion estado_atencion [not null, default: 'PENDIENTE']
+  fecha_hora timestamptz [not null, default: `now()`]
+  atendida_por int [ref: > usuario.id_usr]
+  atendida_en timestamptz
+  Note: 'RF01.2 y RF01.7 alertas y notificaciones de irregularidades'
+}
+
+Table auditoria {
+  id_aud bigint [pk, increment]
+  tabla varchar(60) [not null]
+  operacion char(1) [not null, note: 'I / U / D']
+  id_registro text
+  datos_antes jsonb
+  datos_despues jsonb
+  usuario_db text [not null, default: `current_user`]
+  fecha timestamptz [not null, default: `now()`]
+}

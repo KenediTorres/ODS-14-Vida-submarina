@@ -1,0 +1,92 @@
+---
+title: Modelo Entidad-Relación - SIRDEPA
+---
+erDiagram
+    USUARIO ||--o| PESCADOR : "es"
+    PESCADOR ||--o{ EMBARCACION : "posee"
+    EMBARCACION ||--o{ PERMISO : "tiene"
+    USUARIO ||--o{ PERMISO : "gestiona"
+    PERMISO ||--|{ PERMISO_ESPECIE : "contiene"
+    ESPECIE ||--o{ PERMISO_ESPECIE : "autorizada en"
+    EMBARCACION ||--o{ POSICION_GPS : "reporta"
+    EMBARCACION ||--o{ SENSOR_REGISTRO : "mide"
+    EMBARCACION ||--o{ CAPTURA : "realiza"
+    LOTE ||--o{ CAPTURA : "agrupa"
+    LOCALIZACION ||--o{ CAPTURA : "registra"
+    CAPTURA ||--|{ DETALLE_CAPTURA : "detalla"
+    ESPECIE ||--o{ DETALLE_CAPTURA : "clasifica"
+    CAPTURA ||--o{ EVIDENCIA_FOTO : "respalda"
+    ESPECIE ||--o{ VEDA : "restringe"
+    ZONA ||--o{ VEDA : "aplica en"
+    ZONA ||--o{ LOCALIZACION : "contiene"
+    EMBARCACION ||--o{ ALERTA : "genera"
+    POSICION_GPS ||--o{ ALERTA : "dispara"
+    CAPTURA ||--o{ ALERTA : "dispara"
+
+    USUARIO { int id_usr PK
+              string nombre
+              string email UK
+              enum rol
+              bool auth_2fa }
+    PESCADOR { int id_pesc PK
+               string documento UK
+               string nombre
+               string comunidad
+               string contacto }
+    EMBARCACION { int id_emb PK
+                  string matricula UK
+                  string nombre
+                  enum tipo
+                  decimal eslora_m
+                  int owner_id FK }
+    PERMISO { int id_perm PK
+              int id_emb FK
+              string tipo_permiso
+              date fecha_inicio
+              date fecha_fin }
+    ESPECIE { int id_esp PK
+              string nombre_cientifico UK
+              string nombre_comun
+              decimal talla_minima_cm
+              decimal cuota_anual_t }
+    ZONA { int id_zona PK
+           enum tipo
+           geometry geom }
+    VEDA { int id_veda PK
+           int id_esp FK
+           date fecha_inicio
+           date fecha_fin }
+    LOCALIZACION { int id_loc PK
+                   decimal latitud
+                   decimal longitud }
+    POSICION_GPS { bigint id_pos PK
+                   int id_emb FK
+                   timestamp fecha_hora
+                   bool en_zona_permitida }
+    SENSOR_REGISTRO { bigint id_reg PK
+                      int id_emb FK
+                      string tipo_sensor
+                      decimal valor }
+    LOTE { int id_lote PK
+           uuid codigo_qr UK
+           enum estado_trazabilidad }
+    CAPTURA { int id_capt PK
+              int id_emb FK
+              int id_lote FK
+              int id_loc FK
+              timestamp fecha_hora
+              decimal total_kg }
+    DETALLE_CAPTURA { int id_det PK
+                      int id_capt FK
+                      int id_esp FK
+                      decimal cantidad_kg
+                      decimal talla_promedio_cm
+                      bool cumple_talla_minima }
+    EVIDENCIA_FOTO { int id_foto PK
+                     int id_capt FK
+                     string url }
+    ALERTA { int id_alerta PK
+             int id_emb FK
+             enum tipo_alerta
+             enum nivel_gravedad
+             enum estado_atencion }

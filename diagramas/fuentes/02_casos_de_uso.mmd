@@ -1,0 +1,33 @@
+---
+title: Casos de uso generales - SIRDEPA
+---
+flowchart LR
+    AUT["👤 IMARPE / PRODUCE"]
+    PES["👤 Pescador / Armador"]
+    CON["👤 Consumidor / Mercado"]
+
+    subgraph SIRDEPA
+        direction TB
+        UC1(["Registrar embarcación"])
+        UC2(["Enviar posición GPS"])
+        UC3(["Registrar captura en bitácora"])
+        UC4(["Adjuntar fotos de evidencia"])
+        UC5(["Generar lote y código QR"])
+        UC6(["Generar alertas<br/>zonas restringidas, veda, talla"])
+        UC7(["Generar reportes / dashboards"])
+        UC8(["Auditoría / fiscalización"])
+        UC9(["Gestionar zonas, vedas y cuotas"])
+        UC10(["Verificar trazabilidad por QR"])
+    end
+
+    PES --- UC1
+    PES --- UC2
+    PES --- UC3
+    UC6 --- AUT
+    UC7 --- AUT
+    UC8 --- AUT
+    UC9 --- AUT
+    CON --- UC10
+    UC3 -. "«include»" .-> UC4
+    UC3 -. "«include»" .-> UC5
+    UC2 -. "«extend»" .-> UC6
