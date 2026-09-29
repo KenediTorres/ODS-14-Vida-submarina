@@ -1,19 +1,31 @@
 # Prototipos
 
-Mockups y wireframes de la aplicación web y la app móvil de campo de SIRDEPA.
+Prototipos navegables de SIRDEPA (Anexo B del informe) usados para validar los requerimientos con el personal del DPA.
 
-Nomenclatura sugerida: `NN_modulo_pantalla.png` (por ejemplo `01_flota_registro_embarcacion.png`, `02_bitacora_registrar_captura.png`).
+Archivos previstos:
 
-Pantallas previstas:
+- `app.html`: aplicación móvil del registrador y del patrón
+- `web.html`: portal web de gestión y tablero del DPA
+- capturas de cada pantalla en PNG
 
-| Módulo | Pantalla | Plataforma | HU |
-|---|---|---|---|
-| Acceso | Inicio de sesión con 2FA | Web / Móvil | T07 |
-| Flota | Registro de embarcación | Web | HU01 |
-| Flota | Mapa de embarcaciones en tiempo real | Web | HU03 |
-| Bitácora | Registrar captura + fotos | Móvil | HU04, HU05 |
-| Trazabilidad | Código QR del lote | Móvil | HU06 |
-| Normativa | Zonas, vedas y permisos | Web | HU07 – HU09 |
-| Alertas | Bandeja de alertas del inspector | Web | HU10 |
-| Reportes | Dashboard de desembarques | Web | HU11, HU12 |
-| Público | Consulta de trazabilidad por QR | Web | HU13 |
+## Pantallas por prototipar
+
+| Plataforma | Pantalla | Historias |
+|---|---|---|
+| App móvil | Ingreso con DNI, PIN y código SMS | HU02 |
+| App móvil | Nuevo desembarque: búsqueda de embarcación por matrícula | HU06 |
+| App móvil | Detalle por especie con total automático | HU07 |
+| App móvil | Muestreo de tallas | HU10 |
+| App móvil | Resultado de validación (Conforme / Observado / No conforme) | HU09 |
+| App móvil | Constancia con QR y envío por SMS | HU11 |
+| App móvil | Asignación de lotes con saldo pendiente | HU12 |
+| App móvil | Indicador de registros pendientes de sincronizar | HU08 |
+| App móvil | Aviso de arribo del patrón | HU20 |
+| Web pública | Verificación de constancia por QR | HU13 |
+| Portal web | Usuarios, embarcaciones y permisos | HU01, HU03, HU04 |
+| Portal web | Catálogo normativo: especies, tallas, artes, cuadrículas y vedas | HU05 |
+| Portal web | Bandeja de alertas del fiscalizador | HU15 |
+| Portal web | Tablero de indicadores y cierre diario | HU16, HU24 |
+| Portal web | Reportes para IMARPE y exportación SITRAPESCA | HU17, HU18 |
+
+Criterios de diseño que deben respetar (RNF01–RNF03): registro en ≤ 5 pantallas, botones de al menos 48 × 48 dp, contraste ≥ 4,5:1 y etiquetas en el lenguaje del sector.

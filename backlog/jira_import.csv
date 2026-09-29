@@ -1,137 +1,212 @@
-Issue ID,Parent ID,Issue Type,Summary,Epic Name,Description,Priority,Status,Sprint,Story Points,Labels,Labels,Labels
-EP01,,Epic,Gestión de flota pesquera,Gestión de flota pesquera,"Registro de embarcaciones y pescadores, y monitoreo satelital de su posición.",High,To Do,,,sirdepa,ods14,
-EP02,,Epic,Actividades pesqueras,Actividades pesqueras,"Bitácora digital de capturas, evidencia fotográfica y trazabilidad por lote/QR.",High,To Do,,,sirdepa,ods14,
-EP03,,Epic,Gestión normativa,Gestión normativa,"Zonas, vedas, tallas mínimas, cuotas y permisos, con alertas automáticas de incumplimiento.",High,To Do,,,sirdepa,ods14,
-EP04,,Epic,Inteligencia pesquera,Inteligencia pesquera,"Reportes, dashboards y verificación pública de trazabilidad para la toma de decisiones.",High,To Do,,,sirdepa,ods14,
-EP05,,Epic,Gestión medioambiental,Gestión medioambiental,Datos oceanográficos/meteorológicos e indicadores de sostenibilidad del recurso.,High,To Do,,,sirdepa,ods14,
-EP06,,Epic,Plataforma y seguridad,Plataforma y seguridad,"Base de datos, aplicaciones, autenticación, roles, auditoría y cifrado (habilitadores técnicos).",High,To Do,,,sirdepa,ods14,
-HU01,EP01,Story,"HU01 - Registrar mi embarcación con matrícula, tipo, eslora y capacidad de bodega",,"Como armador, quiero registrar mi embarcación con matrícula, tipo, eslora y capacidad de bodega, para que quede habilitada para operar y ser monitoreada.
+Issue ID,Parent ID,Issue Type,Summary,Epic Name,Description,Priority,Sprint,Story Points,Labels,Labels,Labels
+E1,,Epic,Acceso y maestros,Acceso y maestros,"Controlar el acceso y registrar embarcaciones, permisos y catálogos.
+
+Requerimientos: RF01–RF04",High,,,sirdepa,,
+E2,,Epic,Registro en el muelle,Registro en el muelle,"Registrar el desembarque en minutos, incluso sin señal.
+
+Requerimientos: RF05–RF08, RF11, RF12",High,,,sirdepa,,
+E3,,Epic,Validación normativa,Validación normativa,"Clasificar cada desembarque según las normas vigentes.
+
+Requerimientos: RF09, RF10",High,,,sirdepa,,
+E4,,Epic,Constancia y trazabilidad,Constancia y trazabilidad,"Emitir constancias verificables y trazar los lotes vendidos.
+
+Requerimientos: RF13–RF16",High,,,sirdepa,,
+E5,,Epic,Fiscalización y control,Fiscalización y control,"Alertar, registrar observaciones y auditar cambios.
+
+Requerimientos: RF17, RF22, RF23",High,,,sirdepa,,
+E6,,Epic,Información y reportes,Información y reportes,"Tablero, reportes, exportación e historial del armador.
+
+Requerimientos: RF18–RF21, RF24",High,,,sirdepa,,
+HU01,E1,Story,HU01 - Registrar usuarios con su rol y DPA asignado,,"Como administrador del sistema, quiero registrar usuarios con su rol y DPA asignado, para controlar quién accede a cada función.
 
 Criterios de aceptación:
-- La matrícula es única y obligatoria
-- Se asocia a un pescador propietario existente
-- Queda en estado ACTIVA y se registra en auditoría
+- Dado un DNI no registrado, cuando creo el usuario, entonces recibe por SMS un PIN temporal.
+- No se permiten DNI duplicados.
 
-Requerimientos: RF01.3, RD01",Highest,To Do,SIRDEPA Sprint 1,5,sirdepa,sprint1,
-HU02,EP01,Story,"HU02 - Registrar pescadores con su DNI, comunidad y contacto",,"Como administrador, quiero registrar pescadores con su DNI, comunidad y contacto, para vincularlos como propietarios o tripulantes de embarcaciones.
-
-Criterios de aceptación:
-- El documento es único
-- Se puede vincular a un usuario del sistema
-- Se valida el formato del DNI (8 dígitos)
-
-Requerimientos: RD01",High,To Do,SIRDEPA Sprint 1,3,sirdepa,sprint1,
-HU03,EP01,Story,HU03 - Recibir la posición GPS de cada embarcación cada 15 minutos,,"Como fiscalizador de PRODUCE, quiero recibir la posición GPS de cada embarcación cada 15 minutos, para conocer en todo momento dónde se está pescando.
+Requerimientos: RF01
+Prioridad MoSCoW: M",High,SIRDEPA Sprint 1,3,sirdepa,moscow-M,sprint-1
+HU02,E1,Story,"HU02 - Ingresar con mi DNI, mi PIN y un código por SMS",,"Como usuario, quiero ingresar con mi DNI, mi PIN y un código por SMS, para acceder sin necesitar correo electrónico.
 
 Criterios de aceptación:
-- Se almacena fecha, latitud, longitud, velocidad y rumbo
-- Se aceptan envíos en lote cuando no hay señal (sync batch)
-- No se duplican posiciones para la misma embarcación y hora
-- La última posición se consulta en menos de 3 s
+- Dado un DNI y PIN correctos, cuando ingreso el código recibido, entonces accedo según mi rol.
+- Tras 5 intentos fallidos la cuenta se bloquea 15 minutos.
 
-Requerimientos: RF01.1, RNF 01.1",Highest,To Do,SIRDEPA Sprint 1,8,sirdepa,sprint1,
-HU04,EP02,Story,"HU04 - Registrar mi captura en una bitácora digital indicando especie, kg y talla promedio",,"Como pescador artesanal, quiero registrar mi captura en una bitácora digital indicando especie, kg y talla promedio, para cumplir con la declaración sin trámites en papel.
-
-Criterios de aceptación:
-- Una captura puede tener varias especies
-- El total en kg se calcula automáticamente
-- Funciona desde el celular y guarda offline hasta tener señal
-- El registro toma menos de 2 minutos
-
-Requerimientos: RF01.3, RD09",Highest,To Do,SIRDEPA Sprint 1,8,sirdepa,sprint1,
-HU05,EP02,Story,HU05 - Adjuntar fotos de mi captura,,"Como pescador artesanal, quiero adjuntar fotos de mi captura, para tener evidencia que respalde lo declarado.
+Requerimientos: RF01
+Prioridad MoSCoW: M",High,SIRDEPA Sprint 1,5,sirdepa,moscow-M,sprint-1
+HU03,E1,Story,"HU03 - Registrar embarcaciones con matrícula, eslora y capacidad de bodega",,"Como administrador del DPA, quiero registrar embarcaciones con matrícula, eslora y capacidad de bodega, para que se clasifiquen como artesanales o de menor escala.
 
 Criterios de aceptación:
-- Se aceptan fotos JPG/PNG de hasta 5 MB
-- Se guarda el hash SHA-256 para garantizar integridad
-- Se puede adjuntar más de una foto por captura
+- Dada una bodega mayor a 32,6 m³, cuando guardo, entonces el sistema rechaza la categoría artesanal.
+- La matrícula es única.
 
-Requerimientos: RF01.4",Medium,To Do,SIRDEPA Sprint 1,3,sirdepa,sprint1,
-HU06,EP02,Story,HU06 - Que se genere un código QR único por lote de captura,,"Como armador, quiero que se genere un código QR único por lote de captura, para certificar el origen legal del producto ante compradores.
-
-Criterios de aceptación:
-- El QR contiene un UUID único
-- Solo se genera si la captura pasó la validación
-- El QR se puede descargar e imprimir
-
-Requerimientos: RF01.5",High,To Do,SIRDEPA Sprint 1,5,sirdepa,sprint1,
-HU07,EP03,Story,HU07 - Definir zonas restringidas y reservas marinas como polígonos en el mapa,,"Como analista de PRODUCE, quiero definir zonas restringidas y reservas marinas como polígonos en el mapa, para que el sistema detecte ingresos no autorizados.
+Requerimientos: RF02
+Prioridad MoSCoW: M",High,SIRDEPA Sprint 1,3,sirdepa,moscow-M,sprint-1
+HU04,E1,Story,"HU04 - Registrar permisos con su vigencia, especies y artes autorizados",,"Como administrador del DPA, quiero registrar permisos con su vigencia, especies y artes autorizados, para que cada desembarque se valide automáticamente.
 
 Criterios de aceptación:
-- Las zonas tienen tipo, norma legal y vigencia
-- Se pueden cargar polígonos en formato GeoJSON
-- Una zona vencida deja de generar alertas
+- Dado un permiso vencido, cuando consulto la embarcación, entonces aparece «sin permiso vigente».
 
-Requerimientos: RF01.2, RD01",Highest,To Do,SIRDEPA Sprint 2,5,sirdepa,sprint2,
-HU08,EP03,Story,"HU08 - Registrar vedas, tallas mínimas y cuotas por especie",,"Como investigador de IMARPE, quiero registrar vedas, tallas mínimas y cuotas por especie, para que las capturas se validen contra la normativa vigente.
-
-Criterios de aceptación:
-- Una veda tiene especie, fechas y opcionalmente zona
-- Cada especie tiene talla mínima y cuota anual
-- Los cambios quedan en auditoría
-
-Requerimientos: RD01, RD17",High,To Do,SIRDEPA Sprint 2,5,sirdepa,sprint2,
-HU09,EP03,Story,HU09 - Gestionar los permisos de pesca de cada embarcación y las especies autorizadas,,"Como fiscalizador de PRODUCE, quiero gestionar los permisos de pesca de cada embarcación y las especies autorizadas, para saber quién puede pescar qué y hasta cuándo.
+Requerimientos: RF03
+Prioridad MoSCoW: M",High,SIRDEPA Sprint 1,5,sirdepa,moscow-M,sprint-1
+HU05,E1,Story,"HU05 - Mantener especies, tallas mínimas, tolerancias, artes, zonas y vedas con su norma",,"Como administrador, quiero mantener especies, tallas mínimas, tolerancias, artes, zonas y vedas con su norma, para actualizar las reglas sin programar.
 
 Criterios de aceptación:
-- El número de resolución es único
-- El permiso indica especies autorizadas
-- Una captura sin permiso vigente genera alerta CRÍTICA
+- Dado un cambio de talla mínima, cuando lo registro con su resolución, entonces se aplica a los desembarques posteriores y no a los anteriores.
 
-Requerimientos: RD01",High,To Do,SIRDEPA Sprint 2,5,sirdepa,sprint2,
-HU10,EP03,Story,"HU10 - Recibir alertas automáticas de ingreso a zona restringida, talla menor, veda o permiso vencido",,"Como inspector, quiero recibir alertas automáticas de ingreso a zona restringida, talla menor, veda o permiso vencido, para actuar rápido ante pesca ilegal.
-
-Criterios de aceptación:
-- Cada alerta tiene tipo, gravedad y estado de atención
-- Se notifica a IMARPE, PRODUCE y al usuario involucrado
-- El inspector puede marcarla como atendida o descartada
-
-Requerimientos: RF01.2, RF01.7",Highest,To Do,SIRDEPA Sprint 2,8,sirdepa,sprint2,
-HU11,EP04,Story,"HU11 - Ver un dashboard con desembarques por período, especie y zona",,"Como analista de IMARPE, quiero ver un dashboard con desembarques por período, especie y zona, para tomar decisiones sobre vedas y cuotas con datos en tiempo real.
+Requerimientos: RF04
+Prioridad MoSCoW: M",High,SIRDEPA Sprint 1,5,sirdepa,moscow-M,sprint-1
+HU06,E2,Story,HU06 - Registrar un desembarque buscando la embarcación por matrícula o nombre,,"Como registrador del DPA, quiero registrar un desembarque buscando la embarcación por matrícula o nombre, para documentar cada arribo en menos de 3 minutos.
 
 Criterios de aceptación:
-- Filtros por rango de fechas, especie y zona
-- Muestra avance de cuota por especie
-- Muestra alertas pendientes por gravedad
+- Dada una embarcación registrada, cuando escribo tres caracteres de su matrícula, entonces aparece en la lista.
+- El registro exige zarpe, arribo, zona y arte.
 
-Requerimientos: RD17",High,To Do,SIRDEPA Sprint 2,8,sirdepa,sprint2,
-HU12,EP04,Story,HU12 - Exportar los reportes a Excel y PDF,,"Como analista de IMARPE, quiero exportar los reportes a Excel y PDF, para compartirlos en informes oficiales.
-
-Criterios de aceptación:
-- El Excel conserva los filtros aplicados
-- El PDF incluye fecha de generación y usuario
-
-Requerimientos: RD17",Medium,To Do,SIRDEPA Sprint 2,3,sirdepa,sprint2,
-HU13,EP04,Story,HU13 - Escanear el QR de un lote y ver su origen,,"Como consumidor o comprador, quiero escanear el QR de un lote y ver su origen, para comprobar que el producto proviene de pesca legal.
+Requerimientos: RF06
+Prioridad MoSCoW: M",High,SIRDEPA Sprint 1,8,sirdepa,moscow-M,sprint-1
+HU07,E2,Story,"HU07 - Agregar varias especies con su peso, presentación y precio en playa",,"Como registrador, quiero agregar varias especies con su peso, presentación y precio en playa, para reflejar la composición real de la descarga.
 
 Criterios de aceptación:
-- La consulta no requiere iniciar sesión
-- Muestra embarcación, fecha, lugar, especie y si cumple talla
-- No expone datos personales del pescador
+- Dado un peso menor o igual a cero, cuando intento guardar, entonces el sistema lo impide.
+- El total se calcula automáticamente.
 
-Requerimientos: RF01.5",Medium,To Do,SIRDEPA Sprint 2,3,sirdepa,sprint2,
-HU14,EP05,Story,"HU14 - Registrar lecturas de sensores (temperatura del agua, oleaje, viento)",,"Como investigador de IMARPE, quiero registrar lecturas de sensores (temperatura del agua, oleaje, viento), para relacionar las capturas con las condiciones del mar.
-
-Criterios de aceptación:
-- Cada lectura tiene tipo, valor, unidad y hora
-- Se generan alertas meteorológicas por umbral
-
-Requerimientos: RF01.6",Medium,To Do,SIRDEPA Sprint 2,5,sirdepa,sprint2,
-HU15,EP05,Story,"HU15 - Consultar indicadores de sostenibilidad (porcentaje de juveniles, avance de cuota)",,"Como organización ambiental, quiero consultar indicadores de sostenibilidad (porcentaje de juveniles, avance de cuota), para evaluar la salud del recurso.
+Requerimientos: RF07
+Prioridad MoSCoW: M",High,SIRDEPA Sprint 1,5,sirdepa,moscow-M,sprint-1
+HU08,E2,Story,HU08 - Registrar sin conexión y que el sistema sincronice después,,"Como registrador, quiero registrar sin conexión y que el sistema sincronice después, para no detener el trabajo cuando falla la señal.
 
 Criterios de aceptación:
-- Se muestra el porcentaje de capturas bajo talla mínima por especie
-- Se muestra el avance de cuota anual
-- Los datos son agregados y anónimos
+- Dado el modo avión, cuando registro 3 desembarques y luego recupero la señal, entonces llegan los 3 al servidor sin duplicados.
 
-Requerimientos: RD17",Medium,To Do,SIRDEPA Sprint 2,5,sirdepa,sprint2,
-T01,EP06,Task,T01 - Diseñar esquema de base de datos PostgreSQL,,Crear el esquema principal con PostgreSQL 16 y PostGIS (base-de-datos/sirdepa_schema.sql),High,To Do,SIRDEPA Sprint 1,5,sirdepa,tecnico,sprint1
-T02,EP06,Task,T02 - Implementar geolocalización con PostGIS,,Integrar PostGIS para capturar y consultar ubicaciones y zonas,High,To Do,SIRDEPA Sprint 1,3,sirdepa,tecnico,sprint1
-T03,EP06,Task,T03 - Crear diccionario de datos,,Documentar todas las tablas y campos (base-de-datos/diccionario_datos.json),Medium,To Do,SIRDEPA Sprint 1,2,sirdepa,tecnico,sprint1
-T04,EP06,Task,T04 - Diseñar prototipos de UI/UX,,Crear diseños visuales para la aplicación web y móvil (docs/prototipos),High,To Do,SIRDEPA Sprint 1,5,sirdepa,tecnico,sprint1
-T05,EP06,Task,T05 - Crear aplicación web,,Desarrollar la interfaz web responsiva del sistema SIRDEPA,High,To Do,SIRDEPA Sprint 1,8,sirdepa,tecnico,sprint1
-T06,EP06,Task,T06 - Crear aplicación móvil,,Desarrollar la aplicación móvil para registro en campo con modo offline,Medium,To Do,SIRDEPA Sprint 2,8,sirdepa,tecnico,sprint2
-T07,EP06,Task,T07 - Implementar autenticación de usuarios,,"Login, sesiones y autenticación de dos factores para usuarios críticos (RNF 01.2)",High,To Do,SIRDEPA Sprint 1,5,sirdepa,tecnico,sprint1
-T08,EP06,Task,T08 - Gestión de roles y permisos,,"Control de acceso por rol: ADMIN, IMARPE, PRODUCE, INSPECTOR, ARMADOR, PESCADOR",High,To Do,SIRDEPA Sprint 1,3,sirdepa,tecnico,sprint1
-T09,EP06,Task,T09 - Auditoría de cambios,,Registro de todas las modificaciones en tablas críticas,Medium,To Do,SIRDEPA Sprint 2,3,sirdepa,tecnico,sprint2
-T10,EP06,Task,T10 - Encriptación de datos,,Cifrado en tránsito (HTTPS) y de información sensible en reposo,High,To Do,SIRDEPA Sprint 2,3,sirdepa,tecnico,sprint2
+Requerimientos: RF12
+Prioridad MoSCoW: M",High,SIRDEPA Sprint 2,8,sirdepa,moscow-M,sprint-2
+HU09,E3,Story,"HU09 - Que al confirmar se validen permiso, especie, arte y veda",,"Como registrador, quiero que al confirmar se validen permiso, especie, arte y veda, para saber de inmediato si el desembarque es conforme.
+
+Criterios de aceptación:
+- Dada una especie en veda, cuando confirmo, entonces el resultado es No conforme e indica el motivo y la norma.
+
+Requerimientos: RF10
+Prioridad MoSCoW: M",High,SIRDEPA Sprint 2,8,sirdepa,moscow-M,sprint-2
+HU10,E3,Story,HU10 - Registrar un muestreo de tallas,,"Como registrador, quiero registrar un muestreo de tallas, para que el sistema calcule el porcentaje bajo la talla mínima.
+
+Criterios de aceptación:
+- Dada una muestra con 14 % bajo la talla y una tolerancia de 10 %, cuando confirmo, entonces el resultado es Observado.
+
+Requerimientos: RF09
+Prioridad MoSCoW: S",Medium,SIRDEPA Sprint 2,5,sirdepa,moscow-S,sprint-2
+HU11,E4,Story,HU11 - Emitir una constancia con QR y enviarla por SMS al armador,,"Como registrador, quiero emitir una constancia con QR y enviarla por SMS al armador, para que tenga prueba del origen legal de su pesca.
+
+Criterios de aceptación:
+- Dado un desembarque validado, cuando emito, entonces se genera un PDF con código único y QR, y el armador recibe el SMS.
+
+Requerimientos: RF13
+Prioridad MoSCoW: M",High,SIRDEPA Sprint 2,8,sirdepa,moscow-M,sprint-2
+HU12,E4,Story,HU12 - Asignar los kilos de cada especie a uno o más compradores y vehículos,,"Como registrador, quiero asignar los kilos de cada especie a uno o más compradores y vehículos, para trazar el destino de la pesca.
+
+Criterios de aceptación:
+- La suma asignada no puede superar lo desembarcado.
+- Se muestra el saldo pendiente.
+
+Requerimientos: RF14
+Prioridad MoSCoW: M",High,SIRDEPA Sprint 2,5,sirdepa,moscow-M,sprint-2
+HU13,E4,Story,HU13 - Escanear el QR y ver si la constancia es válida,,"Como fiscalizador o comerciante, quiero escanear el QR y ver si la constancia es válida, para verificar la procedencia en segundos.
+
+Criterios de aceptación:
+- Dada una constancia anulada o alterada, cuando la escaneo, entonces se muestra «NO VÁLIDA».
+- Respuesta en 2 s o menos.
+
+Requerimientos: RF16
+Prioridad MoSCoW: M",High,SIRDEPA Sprint 2,5,sirdepa,moscow-M,sprint-2
+HU14,E4,Story,HU14 - Confirmar la recepción de mi lote,,"Como comerciante, quiero confirmar la recepción de mi lote, para cerrar la cadena de custodia.
+
+Criterios de aceptación:
+- Dado un lote despachado a mi RUC, cuando confirmo, entonces pasa a «Recibido» con fecha y hora.
+
+Requerimientos: RF15
+Prioridad MoSCoW: S",Medium,,3,sirdepa,moscow-S,release-2
+HU15,E5,Story,HU15 - Recibir alertas de desembarques no conformes y registrar observaciones,,"Como fiscalizador, quiero recibir alertas de desembarques no conformes y registrar observaciones, para priorizar mis inspecciones.
+
+Criterios de aceptación:
+- Dado un desembarque No conforme, cuando se emite, entonces aparece en mi bandeja en menos de un minuto.
+
+Requerimientos: RF17, RF22
+Prioridad MoSCoW: S",Medium,,5,sirdepa,moscow-S,release-2
+HU16,E6,Story,"HU16 - Un tablero con kilos por día, especie, embarcación y arte",,"Como administrador del DPA, quiero un tablero con kilos por día, especie, embarcación y arte, para gestionar el desembarcadero con datos.
+
+Criterios de aceptación:
+- Los filtros por fecha y especie actualizan los indicadores en 5 s o menos.
+
+Requerimientos: RF18
+Prioridad MoSCoW: S",Medium,,8,sirdepa,moscow-S,release-2
+HU17,E6,Story,HU17 - Exportar los desembarques del mes con captura y esfuerzo,,"Como analista del IMARPE, quiero exportar los desembarques del mes con captura y esfuerzo, para incorporarlos a mis análisis.
+
+Criterios de aceptación:
+- El archivo CSV o Excel incluye embarcación, arte, zona, días de pesca, especie y kilos.
+
+Requerimientos: RF19
+Prioridad MoSCoW: S",Medium,,5,sirdepa,moscow-S,release-2
+HU18,E6,Story,HU18 - Exportar los datos con la estructura del módulo de descarga del SITRAPESCA,,"Como analista de PRODUCE, quiero exportar los datos con la estructura del módulo de descarga del SITRAPESCA, para evitar la doble digitación.
+
+Criterios de aceptación:
+- El archivo contiene todos los campos exigidos en el RD05.
+
+Requerimientos: RF20
+Prioridad MoSCoW: S",Medium,,8,sirdepa,moscow-S,release-2
+HU19,E6,Story,HU19 - Consultar mi historial y descargar mis constancias,,"Como armador, quiero consultar mi historial y descargar mis constancias, para demostrar mi esfuerzo pesquero.
+
+Criterios de aceptación:
+- Solo veo los desembarques de mis embarcaciones.
+
+Requerimientos: RF21
+Prioridad MoSCoW: S",Medium,,5,sirdepa,moscow-S,release-2
+HU20,E2,Story,HU20 - Enviar un aviso de arribo desde mi celular,,"Como patrón, quiero enviar un aviso de arribo desde mi celular, para agilizar la atención en el muelle.
+
+Criterios de aceptación:
+- El aviso aparece en la lista del registrador del DPA indicado.
+
+Requerimientos: RF05
+Prioridad MoSCoW: S",Medium,,3,sirdepa,moscow-S,release-2
+HU21,E5,Story,HU21 - Anular un desembarque indicando el motivo,,"Como administrador del DPA, quiero anular un desembarque indicando el motivo, para corregir errores sin perder la trazabilidad.
+
+Criterios de aceptación:
+- La anulación exige motivo, queda en la auditoría y el QR responde «NO VÁLIDA».
+
+Requerimientos: RF23
+Prioridad MoSCoW: S",Medium,,3,sirdepa,moscow-S,release-2
+HU22,E2,Story,HU22 - Leer el peso desde una balanza digital,,"Como registrador, quiero leer el peso desde una balanza digital, para evitar errores de digitación.
+
+Criterios de aceptación:
+- Dada una balanza emparejada, cuando pulso «Leer balanza», entonces el peso se completa solo.
+
+Requerimientos: RF08
+Prioridad MoSCoW: C",Low,,5,sirdepa,moscow-C,release-2
+HU23,E2,Story,HU23 - Adjuntar fotos de la descarga,,"Como registrador, quiero adjuntar fotos de la descarga, para contar con evidencia.
+
+Criterios de aceptación:
+- Máximo 3 fotos de hasta 300 KB cada una, guardadas con su hash.
+
+Requerimientos: RF11
+Prioridad MoSCoW: S",Medium,,3,sirdepa,moscow-S,release-2
+HU24,E6,Story,HU24 - Realizar el cierre diario,,"Como administrador del DPA, quiero realizar el cierre diario, para cuadrar los kilos registrados y despachados.
+
+Criterios de aceptación:
+- El cierre muestra las diferencias por especie y bloquea la edición de los registros del día.
+
+Requerimientos: RF24
+Prioridad MoSCoW: C",Low,,3,sirdepa,moscow-C,release-2
+T01,HU01,Sub-task,"Configurar el repositorio, ramas (main, develop, feature) y la integración continua básica",,Tarea técnica del Sprint 1. Estimación: 4 horas. Responsable: por asignar.,Medium,SIRDEPA Sprint 1,,sirdepa,sprint-1,tarea-tecnica
+T02,HU03,Sub-task,"Crear las tablas de usuarios, roles, embarcaciones y permisos (script SQL)",,Tarea técnica del Sprint 1. Estimación: 6 horas. Responsable: por asignar.,Medium,SIRDEPA Sprint 1,,sirdepa,sprint-1,tarea-tecnica
+T03,HU02,Sub-task,"Servicio de autenticación con DNI, PIN y OTP (SMS simulado)",,Tarea técnica del Sprint 1. Estimación: 10 horas. Responsable: por asignar.,Medium,SIRDEPA Sprint 1,,sirdepa,sprint-1,tarea-tecnica
+T04,HU01,Sub-task,Pantallas de administración de usuarios y embarcaciones,,Tarea técnica del Sprint 1. Estimación: 8 horas. Responsable: por asignar.,Medium,SIRDEPA Sprint 1,,sirdepa,sprint-1,tarea-tecnica
+T05,HU04,Sub-task,Registro de permisos con especies y artes autorizados,,Tarea técnica del Sprint 1. Estimación: 8 horas. Responsable: por asignar.,Medium,SIRDEPA Sprint 1,,sirdepa,sprint-1,tarea-tecnica
+T06,HU05,Sub-task,"Carga inicial del catálogo normativo (especies, artes, cuadrículas, vedas)",,Tarea técnica del Sprint 1. Estimación: 6 horas. Responsable: por asignar.,Medium,SIRDEPA Sprint 1,,sirdepa,sprint-1,tarea-tecnica
+T07,HU06,Sub-task,Pantalla móvil «Nuevo desembarque» con búsqueda de embarcación,,Tarea técnica del Sprint 1. Estimación: 12 horas. Responsable: por asignar.,Medium,SIRDEPA Sprint 1,,sirdepa,sprint-1,tarea-tecnica
+T08,HU07,Sub-task,Detalle por especie con cálculo del total,,Tarea técnica del Sprint 1. Estimación: 8 horas. Responsable: por asignar.,Medium,SIRDEPA Sprint 1,,sirdepa,sprint-1,tarea-tecnica
+T09,HU07,Sub-task,Pruebas de aceptación y preparación de la demostración,,Tarea técnica del Sprint 1. Estimación: 6 horas. Responsable: por asignar.,Medium,SIRDEPA Sprint 1,,sirdepa,sprint-1,tarea-tecnica
+T10,HU08,Sub-task,Base de datos local SQLite y cola de sincronización con UUID,,Tarea técnica del Sprint 2. Estimación: 12 horas. Responsable: por asignar.,Medium,SIRDEPA Sprint 2,,sirdepa,sprint-2,tarea-tecnica
+T11,HU08,Sub-task,Servicio idempotente POST /desembarques,,Tarea técnica del Sprint 2. Estimación: 6 horas. Responsable: por asignar.,Medium,SIRDEPA Sprint 2,,sirdepa,sprint-2,tarea-tecnica
+T12,HU09,Sub-task,"Motor de validación (Strategy) con reglas de permiso, especie, arte y veda",,Tarea técnica del Sprint 2. Estimación: 12 horas. Responsable: por asignar.,Medium,SIRDEPA Sprint 2,,sirdepa,sprint-2,tarea-tecnica
+T13,HU10,Sub-task,Regla de talla mínima y pantalla de muestreo,,Tarea técnica del Sprint 2. Estimación: 8 horas. Responsable: por asignar.,Medium,SIRDEPA Sprint 2,,sirdepa,sprint-2,tarea-tecnica
+T14,HU11,Sub-task,Constancia PDF con QR y hash; envío por SMS,,Tarea técnica del Sprint 2. Estimación: 10 horas. Responsable: por asignar.,Medium,SIRDEPA Sprint 2,,sirdepa,sprint-2,tarea-tecnica
+T15,HU12,Sub-task,Asignación de lotes con control de saldo,,Tarea técnica del Sprint 2. Estimación: 6 horas. Responsable: por asignar.,Medium,SIRDEPA Sprint 2,,sirdepa,sprint-2,tarea-tecnica
+T16,HU13,Sub-task,Página pública de verificación por QR,,Tarea técnica del Sprint 2. Estimación: 6 horas. Responsable: por asignar.,Medium,SIRDEPA Sprint 2,,sirdepa,sprint-2,tarea-tecnica
+T17,HU09,Sub-task,Pruebas de corte de red y pruebas unitarias del motor de reglas,,Tarea técnica del Sprint 2. Estimación: 6 horas. Responsable: por asignar.,Medium,SIRDEPA Sprint 2,,sirdepa,sprint-2,tarea-tecnica
+T18,HU13,Sub-task,Sprint Review con personal del DPA piloto y retrospectiva,,Tarea técnica del Sprint 2. Estimación: 4 horas. Responsable: por asignar.,Medium,SIRDEPA Sprint 2,,sirdepa,sprint-2,tarea-tecnica

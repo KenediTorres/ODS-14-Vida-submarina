@@ -1,306 +1,418 @@
 // =====================================================================
 //  SIRDEPA - Sistema de Registro de Desembarque Pesquero Artesanal
-//  Proyecto "Vida Submarina" (ODS 14)
-//  Pegar en https://dbdiagram.io para visualizar el modelo.
-//  Fuente de verdad ejecutable: sirdepa_schema.sql (PostgreSQL 16 + PostGIS)
+//  Modelo relacional para dbdiagram.io (https://dbdiagram.io)
+//  Generado desde sirdepa_schema.sql; no editar a mano.
 // =====================================================================
 
 Project SIRDEPA {
   database_type: 'PostgreSQL'
-  Note: 'Modelo de datos del sistema de monitoreo y registro de desembarque pesquero artesanal (ODS 14 - Vida Submarina).'
+  Note: 'ODS 14 - Registro de desembarque pesquero artesanal. Entidad central: desembarque.'
 }
 
-Enum rol_usuario {
-  ADMIN
-  IMARPE
-  PRODUCE
-  INSPECTOR
-  ARMADOR
-  PESCADOR
-  INVESTIGADOR
-}
-
-Enum tipo_embarcacion {
+Enum categoria_pesca {
   ARTESANAL
   MENOR_ESCALA
-  MAYOR_ESCALA
-}
-
-Enum estado_embarcacion {
-  ACTIVA
-  EN_PUERTO
-  SUSPENDIDA
-  BAJA
-}
-
-Enum tipo_zona {
-  PERMITIDA
-  RESTRINGIDA
-  RESERVA_MARINA
-  VEDA_ESPACIAL
-}
-
-Enum estado_permiso {
-  VIGENTE
-  VENCIDO
-  SUSPENDIDO
-  REVOCADO
 }
 
 Enum estado_validacion {
-  PENDIENTE
   CONFORME
-  OBSERVADA
+  OBSERVADO
+  NO_CONFORME
+}
+
+Enum estado_registro {
+  BORRADOR
+  EMITIDO
+  ANULADO
+}
+
+Enum origen_registro {
+  APP_MOVIL
+  PORTAL_WEB
 }
 
 Enum estado_lote {
-  GENERADO
-  EN_TRANSITO
-  COMERCIALIZADO
-  OBSERVADO
+  DESPACHADO
+  RECIBIDO
 }
 
-Enum tipo_alerta {
-  ZONA_RESTRINGIDA
-  TALLA_MINIMA
-  VEDA
-  CUOTA_EXCEDIDA
-  PERMISO_VENCIDO
-  SIN_SENAL_GPS
-  METEOROLOGICA
-}
-
-Enum nivel_gravedad {
-  BAJA
-  MEDIA
-  ALTA
-  CRITICA
-}
-
-Enum estado_atencion {
+Enum estado_aviso {
   PENDIENTE
-  EN_REVISION
-  ATENDIDA
-  DESCARTADA
+  ATENDIDO
+  CANCELADO
 }
 
-TableGroup actores {
+TableGroup acceso_y_seguridad {
+  rol
   usuario
-  pescador
-  embarcacion
-}
-
-TableGroup normativa {
-  zona
-  especie
-  veda
-  permiso
-  permiso_especie
-}
-
-TableGroup operacion {
-  localizacion
-  posicion_gps
-  sensor_registro
-  captura
-  detalle_captura
-  evidencia_foto
-}
-
-TableGroup trazabilidad_control {
-  lote
-  alerta
   auditoria
+  parametro
+}
+
+TableGroup maestros {
+  lugar_desembarque
+  armador
+  embarcacion
+  permiso_pesca
+  permiso_especie
+  permiso_arte
+  comprador
+}
+
+TableGroup catalogo_normativo {
+  especie
+  talla_minima
+  arte_pesca
+  zona_pesca
+  veda
+}
+
+TableGroup registro_y_validacion {
+  aviso_arribo
+  desembarque
+  detalle_desembarque
+  muestreo_talla
+  evidencia_foto
+  resultado_validacion
+}
+
+TableGroup trazabilidad_y_control {
+  constancia
+  lote_destino
+  inspeccion
+  alerta
+  cierre_diario
+}
+
+Table parametro {
+  clave varchar(60) [pk, note: 'Nombre del parámetro']
+  valor numeric [not null, note: 'Valor numérico']
+  descripcion text [not null, note: 'Para qué sirve el parámetro']
+  Note: 'Parámetros del motor de reglas que se ajustan sin programar (RNF12).'
+}
+
+Table rol {
+  id_rol smallint [pk, increment, note: 'Identificador del rol']
+  codigo varchar(20) [not null, unique, note: 'Código del rol (REGISTRADOR, ADMIN_DPA, ...)']
+  nombre varchar(60) [not null, note: 'Nombre visible del rol']
+  Note: 'Siete roles con permisos diferenciados (RF01).'
+}
+
+Table lugar_desembarque {
+  id_lugar integer [pk, increment, note: 'Identificador del lugar']
+  codigo varchar(20) [not null, unique, note: 'Código único del lugar']
+  nombre varchar(120) [not null, note: 'Nombre del DPA o caleta']
+  tipo varchar(20) [not null, note: 'DPA, CALETA o PUNTO_DESEMBARQUE']
+  region varchar(40) [not null, note: 'Región']
+  ubicacion "geometry(Point,4326)" [note: 'Punto geográfico WGS84 (SRID 4326)']
+  Note: 'DPA, caletas y puntos donde la pesca artesanal llega a tierra.'
 }
 
 Table usuario {
-  id_usr int [pk, increment]
-  nombre varchar(120) [not null]
-  email varchar(150) [not null, unique]
-  password_hash varchar(255) [not null]
-  rol rol_usuario [not null]
-  auth_2fa boolean [not null, default: false, note: 'Obligatorio para ADMIN, IMARPE, PRODUCE, INSPECTOR (RNF 01.2)']
-  activo boolean [not null, default: true]
-  creado_en timestamptz [not null, default: `now()`]
+  id_usuario uuid [pk, default: `gen_random_uuid()`, note: 'Identificador UUID del usuario']
+  dni char(8) [not null, unique, note: 'DNI de 8 dígitos, único']
+  nombres varchar(120) [not null, note: 'Nombres y apellidos']
+  celular varchar(15) [not null, note: 'Celular que recibe el código OTP por SMS']
+  pin_hash varchar(255) [not null, note: 'PIN cifrado con Argon2 o bcrypt']
+  id_rol smallint [not null, note: 'Rol asignado']
+  id_lugar integer [note: 'DPA asignado']
+  activo boolean [not null, default: `true`, note: 'Usuario habilitado']
+  intentos_fallidos smallint [not null, default: `0`, note: 'Intentos fallidos consecutivos de ingreso']
+  bloqueado_hasta timestamptz [note: 'Fin del bloqueo temporal tras 5 intentos fallidos']
+  creado_en timestamptz [not null, default: `now()`, note: 'Fecha de creación']
+  Note: 'Persona autenticada con DNI, PIN y código por SMS (RF01, RNF08).'
 }
 
-Table pescador {
-  id_pesc int [pk, increment]
-  id_usr int [unique, ref: - usuario.id_usr]
-  nombre varchar(120) [not null]
-  tipo_documento varchar(10) [not null, default: 'DNI']
-  documento varchar(15) [not null, unique]
-  comunidad varchar(120)
-  contacto varchar(60)
-  creado_en timestamptz [not null, default: `now()`]
+Table armador {
+  id_armador integer [pk, increment, note: 'Identificador del armador']
+  tipo_documento varchar(3) [not null, note: 'DNI, CE o RUC']
+  numero_documento varchar(11) [not null, note: 'Número de documento']
+  nombre varchar(150) [not null, note: 'Nombre o razón social']
+  celular varchar(15) [note: 'Celular donde recibe el enlace de la constancia']
+  id_usuario uuid [unique, note: 'Cuenta de acceso para consultar su historial (opcional)']
+  consentimiento_en timestamptz [note: 'Fecha del consentimiento para el tratamiento de datos personales (Ley 29733)']
+  Note: 'Titular de embarcaciones; recibe la constancia por SMS.'
 }
 
 Table embarcacion {
-  id_emb int [pk, increment]
-  matricula varchar(20) [not null, unique]
-  nombre varchar(100) [not null]
-  tipo tipo_embarcacion [not null, default: 'ARTESANAL']
-  eslora_m numeric(5,2)
-  capacidad_bodega_m3 numeric(7,2)
-  estado estado_embarcacion [not null, default: 'ACTIVA']
-  owner_id int [not null, ref: > pescador.id_pesc, note: 'Pescador 0..* posee Embarcación']
-  creado_en timestamptz [not null, default: `now()`]
-  indexes {
-    owner_id
-  }
+  id_embarcacion integer [pk, increment, note: 'Identificador de la embarcación']
+  matricula varchar(20) [not null, unique, note: 'Matrícula única']
+  nombre varchar(100) [not null, note: 'Nombre de la embarcación']
+  eslora_m "numeric(5,2)" [not null, note: 'Eslora en metros']
+  capacidad_bodega_m3 "numeric(6,2)" [not null, note: 'Capacidad de bodega en m³ (máximo 32,6)']
+  trabajo_manual boolean [not null, default: `true`, note: 'Predominio del trabajo manual']
+  categoria categoria_pesca [not null, note: 'ARTESANAL o MENOR_ESCALA']
+  id_armador integer [not null, note: 'Armador titular']
+  activa boolean [not null, default: `true`, note: 'Embarcación habilitada']
+  Note: 'Embarcación artesanal o de menor escala de hasta 32,6 m³ de bodega (RF02, RD01).'
 }
 
-Table zona {
-  id_zona int [pk, increment]
-  nombre varchar(120) [not null]
-  tipo tipo_zona [not null]
-  norma_legal varchar(120)
-  vigente_desde date [not null, default: `current_date`]
-  vigente_hasta date
-  geom "geometry(MultiPolygon,4326)" [not null, note: 'Índice GIST']
+Table permiso_pesca {
+  id_permiso integer [pk, increment, note: 'Identificador del permiso']
+  id_embarcacion integer [not null, note: 'Embarcación autorizada']
+  numero_resolucion varchar(60) [not null, unique, note: 'Número de la resolución que otorga el permiso']
+  entidad_emisora varchar(80) [not null, note: 'PRODUCE o Gobierno Regional (DIREPRO)']
+  fecha_emision date [not null, note: 'Inicio de vigencia']
+  fecha_vencimiento date [not null, note: 'Fin de vigencia']
+  Note: 'Permiso de pesca con resolución, entidad emisora y vigencia (RF03).'
+}
+
+Table comprador {
+  id_comprador integer [pk, increment, note: 'Identificador del comprador']
+  tipo_documento varchar(3) [not null, note: 'DNI, CE o RUC']
+  numero_documento varchar(11) [not null, note: 'Número de documento']
+  nombre varchar(150) [not null, note: 'Nombre o razón social']
+  tipo varchar(20) [not null, note: 'COMERCIANTE, PLANTA, MERCADO o CONSUMIDOR']
+  id_usuario uuid [unique, note: 'Cuenta para confirmar la recepción de lotes']
+  Note: 'Comerciante, planta o mercado que recibe lotes (RF14).'
 }
 
 Table especie {
-  id_esp int [pk, increment]
-  nombre_cientifico varchar(120) [not null, unique]
-  nombre_comun varchar(80) [not null]
-  talla_minima_cm numeric(6,2)
-  cuota_anual_t numeric(12,2)
+  id_especie integer [pk, increment, note: 'Identificador de la especie']
+  codigo_fao char(3) [unique, note: 'Código 3-alfa de la lista ASFIS de la FAO']
+  nombre_comun varchar(80) [not null, note: 'Nombre común usado en el muelle']
+  nombre_cientifico varchar(120) [not null, unique, note: 'Nombre científico']
+  Note: 'Especie hidrobiológica con código 3-alfa ASFIS de la FAO (RF04, RNF11).'
+}
+
+Table talla_minima {
+  id_talla integer [pk, increment, note: 'Identificador de la regla de talla']
+  id_especie integer [not null, note: 'Especie']
+  talla_minima_cm "numeric(6,2)" [not null, note: 'Talla mínima de captura en cm']
+  tolerancia_juveniles_pct "numeric(5,2)" [not null, note: 'Porcentaje máximo de ejemplares bajo la talla mínima']
+  norma varchar(80) [not null, note: 'Resolución que fija la talla']
+  vigente_desde date [not null, note: 'Inicio de vigencia']
+  vigente_hasta date [note: 'Fin de vigencia (NULL = vigente)']
+  Note: 'Talla mínima y tolerancia de juveniles con vigencia; un cambio aplica solo a desembarques posteriores (RD03, HU05).'
+}
+
+Table arte_pesca {
+  id_arte integer [pk, increment, note: 'Identificador del arte']
+  nombre varchar(80) [not null, unique, note: 'Nombre del arte de pesca']
+  tipo varchar(40) [not null, note: 'Familia del arte (CERCO, ENMALLE, ANZUELO)']
+  mecanizado boolean [not null, default: `false`, note: 'Arte con sistemas mecanizados']
+  Note: 'Artes y aparejos de pesca (RF04).'
+}
+
+Table zona_pesca {
+  id_zona integer [pk, increment, note: 'Identificador de la zona']
+  codigo_cuadricula varchar(20) [not null, unique, note: 'Código de la cuadrícula de pesca']
+  dentro_5_millas boolean [not null, note: 'Cuadrícula dentro de las 5 millas']
+  dentro_3_millas boolean [not null, note: 'Cuadrícula dentro de las 3 millas']
+  geom "geometry(Polygon,4326)" [note: 'Polígono de la cuadrícula (SRID 4326)']
+  Note: 'Cuadrícula de pesca; se registra la cuadrícula y no la coordenada exacta del caladero (RNF09, RD08).'
 }
 
 Table veda {
-  id_veda int [pk, increment]
-  id_esp int [not null, ref: > especie.id_esp]
-  id_zona int [ref: > zona.id_zona, note: 'NULL = todo el litoral']
-  fecha_inicio date [not null]
-  fecha_fin date [not null]
-  norma_legal varchar(120)
-}
-
-Table permiso {
-  id_perm int [pk, increment]
-  id_emb int [not null, ref: > embarcacion.id_emb, note: 'Embarcación 1..* tiene Permiso']
-  gestionado_por int [ref: > usuario.id_usr, note: 'Usuario 1..* gestiona Permiso']
-  tipo_permiso varchar(60) [not null]
-  numero_resolucion varchar(60) [not null, unique]
-  fecha_inicio date [not null]
-  fecha_fin date [not null]
-  estado estado_permiso [not null, default: 'VIGENTE']
+  id_veda integer [pk, increment, note: 'Identificador de la veda']
+  id_especie integer [not null, note: 'Especie en veda']
+  id_zona integer [note: 'Zona de la veda (NULL = todo el litoral)']
+  fecha_inicio date [not null, note: 'Inicio de la veda']
+  fecha_fin date [not null, note: 'Fin de la veda']
+  norma varchar(80) [not null, note: 'Resolución que dispone la veda']
+  Note: 'Veda por especie y, opcionalmente, por zona, con su norma (RD04).'
 }
 
 Table permiso_especie {
-  id_perm int [pk, ref: > permiso.id_perm]
-  id_esp int [pk, ref: > especie.id_esp]
-  Note: 'Permiso N..* contiene Especie'
-}
-
-Table localizacion {
-  id_loc int [pk, increment]
-  nombre varchar(120) [not null]
-  latitud numeric(9,6) [not null]
-  longitud numeric(9,6) [not null]
-  geom "geometry(Point,4326)" [note: 'Columna generada desde latitud/longitud']
-  id_zona int [ref: > zona.id_zona]
-}
-
-Table posicion_gps {
-  id_pos bigint [pk, increment]
-  id_emb int [not null, ref: > embarcacion.id_emb]
-  fecha_hora timestamptz [not null]
-  latitud numeric(9,6) [not null]
-  longitud numeric(9,6) [not null]
-  geom "geometry(Point,4326)" [note: 'Columna generada']
-  velocidad_nudos numeric(5,2)
-  rumbo_grados numeric(5,2)
-  en_zona_permitida boolean [not null, default: true, note: 'Actualizado por trigger fn_validar_zona_gps']
-  recibido_en timestamptz [not null, default: `now()`]
+  id_permiso integer [not null, note: 'Permiso']
+  id_especie integer [not null, note: 'Especie autorizada']
   indexes {
-    (id_emb, fecha_hora) [unique]
+    (id_permiso, id_especie) [pk]
   }
-  Note: 'MonitoreoGPS - RF01.1 registro cada 15 minutos'
+  Note: 'Especies autorizadas por cada permiso (N:M).'
 }
 
-Table sensor_registro {
-  id_reg bigint [pk, increment]
-  id_emb int [not null, ref: > embarcacion.id_emb, note: 'SensorRegistro N..* de Embarcación']
-  ts timestamptz [not null]
-  latitud numeric(9,6)
-  longitud numeric(9,6)
-  tipo_sensor varchar(40) [not null]
-  valor numeric(10,3) [not null]
-  unidad varchar(15) [not null]
-  Note: 'RF01.6 monitoreo de condiciones meteorológicas y oceanográficas'
-}
-
-Table lote {
-  id_lote int [pk, increment]
-  codigo_qr uuid [not null, unique, default: `gen_random_uuid()`]
-  fecha_creacion timestamptz [not null, default: `now()`]
-  estado_trazabilidad estado_lote [not null, default: 'GENERADO']
-  destino varchar(150)
-  Note: 'RF01.5 código QR único por lote'
-}
-
-Table captura {
-  id_capt int [pk, increment]
-  id_emb int [not null, ref: > embarcacion.id_emb, note: 'Embarcación 1..* tiene Captura']
-  id_lote int [ref: > lote.id_lote, note: 'Captura N..1 pertenece a Lote']
-  id_loc int [ref: > localizacion.id_loc, note: 'Captura 1 registra Localización']
-  registrado_por int [ref: > usuario.id_usr]
-  fecha_hora timestamptz [not null]
-  total_kg numeric(12,2) [not null, default: 0, note: 'Recalculado por trigger']
-  temperatura_agua_c numeric(4,1)
-  arte_pesca varchar(60)
-  estado_validacion estado_validacion [not null, default: 'PENDIENTE']
-  observaciones text
-  creado_en timestamptz [not null, default: `now()`]
-  Note: 'Bitácora digital - RF01.3'
-}
-
-Table detalle_captura {
-  id_det int [pk, increment]
-  id_capt int [not null, ref: > captura.id_capt]
-  id_esp int [not null, ref: > especie.id_esp]
-  cantidad_kg numeric(12,2) [not null]
-  cantidad_unidades int
-  talla_promedio_cm numeric(6,2)
-  cumple_talla_minima boolean [note: 'Calculado por trigger fn_validar_detalle']
+Table permiso_arte {
+  id_permiso integer [not null, note: 'Permiso']
+  id_arte integer [not null, note: 'Arte autorizada']
   indexes {
-    (id_capt, id_esp) [unique]
+    (id_permiso, id_arte) [pk]
   }
+  Note: 'Artes autorizadas por cada permiso (N:M).'
+}
+
+Table aviso_arribo {
+  id_aviso integer [pk, increment, note: 'Identificador del aviso']
+  id_embarcacion integer [not null, note: 'Embarcación que llega']
+  id_lugar integer [not null, note: 'DPA de llegada']
+  hora_estimada timestamptz [not null, note: 'Hora estimada de llegada']
+  captura_aproximada text [note: 'Descripción libre de lo que trae']
+  estado estado_aviso [not null, default: 'PENDIENTE', note: 'PENDIENTE, ATENDIDO o CANCELADO']
+  creado_en timestamptz [not null, default: `now()`, note: 'Fecha de envío del aviso']
+  Note: 'Aviso previo del patrón con hora estimada y captura aproximada (RF05).'
+}
+
+Table desembarque {
+  id_desembarque uuid [pk, note: 'UUID generado en el celular; también es la Idempotency-Key']
+  id_embarcacion integer [not null, note: 'Embarcación']
+  id_lugar integer [not null, note: 'Lugar de desembarque']
+  id_registrador uuid [not null, note: 'Usuario que registró']
+  id_aviso integer [unique, note: 'Aviso de arribo que lo originó']
+  codigo_faena varchar(30) [note: 'Código de faena (RD05)']
+  fecha_zarpe timestamptz [not null, note: 'Fecha y hora de zarpe']
+  fecha_hora_arribo timestamptz [not null, note: 'Fecha y hora de arribo']
+  id_zona integer [not null, note: 'Cuadrícula de pesca']
+  id_arte integer [not null, note: 'Arte de pesca empleado']
+  tripulantes smallint [note: 'Número de tripulantes']
+  estado_validacion estado_validacion [note: 'CONFORME, OBSERVADO o NO_CONFORME']
+  estado_registro estado_registro [not null, default: 'BORRADOR', note: 'BORRADOR, EMITIDO o ANULADO']
+  origen origen_registro [not null, default: 'APP_MOVIL', note: 'APP_MOVIL o PORTAL_WEB']
+  registrado_en timestamptz [not null, note: 'Hora de registro en el celular']
+  sincronizado_en timestamptz [not null, default: `now()`, note: 'Hora de llegada al servidor']
+  motivo_anulacion text [note: 'Motivo obligatorio de la anulación']
+  anulado_por uuid [note: 'Usuario que anuló']
+  anulado_en timestamptz [note: 'Fecha de anulación']
+  Note: 'Entidad central: llegada de una faena de una embarcación a un lugar de desembarque (RF06).'
+}
+
+Table detalle_desembarque {
+  id_detalle integer [pk, increment, note: 'Identificador del detalle']
+  id_desembarque uuid [not null, note: 'Desembarque']
+  id_especie integer [not null, note: 'Especie']
+  peso_kg "numeric(10,2)" [not null, note: 'Peso en kg (mayor que cero)']
+  unidades integer [note: 'Número de ejemplares (opcional)']
+  presentacion varchar(30) [not null, default: 'ENTERO', note: 'Presentación (entero, eviscerado, ...)']
+  precio_playa_kg "numeric(8,2)" [note: 'Precio en playa por kg (S/)']
+  Note: 'Kilos por especie y presentación de un desembarque (RF07).'
+}
+
+Table muestreo_talla {
+  id_muestreo integer [pk, increment, note: 'Identificador del muestreo']
+  id_detalle integer [not null, unique, note: 'Detalle muestreado']
+  tallas_cm "numeric(6,2)[]" [not null, note: 'Tallas medidas en cm']
+  pct_bajo_talla "numeric(5,2)" [note: 'Porcentaje bajo la talla mínima vigente (lo calcula la validación)']
+  registrado_en timestamptz [not null, default: `now()`, note: 'Fecha del muestreo']
+  Note: 'Tallas de una muestra de ejemplares de un detalle (RF09).'
 }
 
 Table evidencia_foto {
-  id_foto int [pk, increment]
-  id_capt int [not null, ref: > captura.id_capt]
-  url text [not null]
-  hash_sha256 char(64) [not null]
-  tomada_en timestamptz [not null, default: `now()`]
-  Note: 'RF01.4 fotos digitales como evidencia'
+  id_foto integer [pk, increment, note: 'Identificador de la foto']
+  id_desembarque uuid [not null, note: 'Desembarque']
+  url text [not null, note: 'Ubicación del archivo']
+  hash_sha256 char(64) [not null, note: 'Hash SHA-256 de la imagen']
+  tamano_kb integer [not null, note: 'Tamaño en KB (máximo 300)']
+  tomada_en timestamptz [not null, default: `now()`, note: 'Fecha de la foto']
+  Note: 'Hasta tres fotografías comprimidas por desembarque (RF11).'
+}
+
+Table resultado_validacion {
+  id_resultado integer [pk, increment, note: 'Identificador del resultado']
+  id_desembarque uuid [not null, note: 'Desembarque evaluado']
+  regla varchar(30) [not null, note: 'Regla evaluada (PERMISO_VIGENTE, VEDA, TALLA_MINIMA, ...)']
+  nivel estado_validacion [not null, note: 'Nivel del resultado']
+  mensaje text [not null, note: 'Explicación en lenguaje sencillo']
+  norma varchar(80) [note: 'Norma que sustenta la regla']
+  evaluado_en timestamptz [not null, default: `now()`, note: 'Fecha de evaluación']
+  Note: 'Resultado de cada regla del motor normativo, no solo el estado final (RF10).'
+}
+
+Table constancia {
+  id_constancia integer [pk, increment, note: 'Identificador de la constancia']
+  id_desembarque uuid [not null, unique, note: 'Desembarque certificado (0..1 constancia por desembarque)']
+  codigo varchar(20) [not null, unique, note: 'Código único impreso en la constancia']
+  hash_sha256 char(64) [not null, note: 'Huella SHA-256 del contenido canónico']
+  url_qr text [not null, note: 'Enlace de verificación codificado en el QR']
+  fecha_emision timestamptz [not null, default: `now()`, note: 'Fecha de emisión']
+  sms_enviado_en timestamptz [note: 'Fecha de envío del SMS al armador']
+  Note: 'Constancia digital con código único, QR y hash SHA-256 (RF13).'
+}
+
+Table lote_destino {
+  id_lote integer [pk, increment, note: 'Identificador del lote']
+  id_detalle integer [not null, note: 'Detalle del que sale el lote']
+  id_comprador integer [not null, note: 'Comprador']
+  peso_kg "numeric(10,2)" [not null, note: 'Kilos asignados']
+  placa_vehiculo varchar(10) [note: 'Placa del vehículo']
+  dni_conductor char(8) [note: 'DNI del conductor']
+  destino varchar(120) [note: 'Destino declarado']
+  estado estado_lote [not null, default: 'DESPACHADO', note: 'DESPACHADO o RECIBIDO']
+  despachado_en timestamptz [not null, default: `now()`, note: 'Fecha de despacho']
+  recibido_en timestamptz [note: 'Fecha de recepción confirmada']
+  recibido_por uuid [note: 'Usuario que confirmó la recepción']
+  Note: 'Kilos de un detalle entregados a un comprador; base de la trazabilidad (RF14, RF15, RD05).'
+}
+
+Table inspeccion {
+  id_inspeccion integer [pk, increment, note: 'Identificador de la inspección']
+  id_desembarque uuid [not null, note: 'Desembarque inspeccionado']
+  id_fiscalizador uuid [not null, note: 'Fiscalizador']
+  fecha_hora timestamptz [not null, default: `now()`, note: 'Fecha y hora']
+  resultado varchar(20) [not null, note: 'SIN_OBSERVACION, OBSERVACION o ACTA']
+  numero_acta varchar(30) [note: 'Número de acta (obligatorio si hay acta)']
+  observacion text [note: 'Detalle de la observación']
+  Note: 'Observación o acta del fiscalizador vinculada al desembarque (RF17).'
 }
 
 Table alerta {
-  id_alerta int [pk, increment]
-  id_emb int [not null, ref: > embarcacion.id_emb]
-  id_pos bigint [ref: > posicion_gps.id_pos]
-  id_capt int [ref: > captura.id_capt]
-  tipo_alerta tipo_alerta [not null]
-  descripcion text [not null]
-  nivel_gravedad nivel_gravedad [not null, default: 'MEDIA']
-  estado_atencion estado_atencion [not null, default: 'PENDIENTE']
-  fecha_hora timestamptz [not null, default: `now()`]
-  atendida_por int [ref: > usuario.id_usr]
-  atendida_en timestamptz
-  Note: 'RF01.2 y RF01.7 alertas y notificaciones de irregularidades'
+  id_alerta integer [pk, increment, note: 'Identificador de la alerta']
+  tipo varchar(30) [not null, note: 'NO_CONFORME o PERMISO_POR_VENCER']
+  id_desembarque uuid [note: 'Desembarque relacionado']
+  id_permiso integer [note: 'Permiso relacionado']
+  mensaje text [not null, note: 'Texto de la alerta']
+  creada_en timestamptz [not null, default: `now()`, note: 'Fecha de creación']
+  atendida_por uuid [note: 'Usuario que la atendió']
+  atendida_en timestamptz [note: 'Fecha de atención']
+  Note: 'Alertas al fiscalizador y avisos de vencimiento de permisos (RF22).'
+}
+
+Table cierre_diario {
+  id_cierre integer [pk, increment, note: 'Identificador del cierre']
+  id_lugar integer [not null, note: 'Lugar de desembarque']
+  fecha date [not null, note: 'Día cerrado']
+  kg_registrados "numeric(12,2)" [not null, note: 'Kilos registrados en el día']
+  kg_despachados "numeric(12,2)" [not null, note: 'Kilos despachados en lotes']
+  cerrado_por uuid [not null, note: 'Usuario que cerró el día']
+  cerrado_en timestamptz [not null, default: `now()`, note: 'Fecha del cierre']
+  Note: 'Cierre del día por lugar de desembarque; bloquea la edición de sus registros (RF24).'
 }
 
 Table auditoria {
-  id_aud bigint [pk, increment]
-  tabla varchar(60) [not null]
-  operacion char(1) [not null, note: 'I / U / D']
-  id_registro text
-  datos_antes jsonb
-  datos_despues jsonb
-  usuario_db text [not null, default: `current_user`]
-  fecha timestamptz [not null, default: `now()`]
+  id_auditoria bigint [pk, increment, note: 'Identificador del registro de auditoría']
+  tabla varchar(40) [not null, note: 'Tabla afectada']
+  operacion char(1) [not null, note: 'I (creación), U (edición) o D (eliminación)']
+  id_registro text [not null, note: 'Clave del registro afectado']
+  datos_antes jsonb [note: 'Registro antes del cambio (JSON)']
+  datos_despues jsonb [note: 'Registro después del cambio (JSON)']
+  usuario_app text [note: 'Usuario de la aplicación que hizo el cambio']
+  fecha timestamptz [not null, default: `now()`, note: 'Fecha del cambio']
+  Note: 'Bitácora inmutable de creaciones, ediciones y anulaciones (RF23, RNF10).'
 }
+
+Ref: usuario.id_rol > rol.id_rol
+Ref: usuario.id_lugar > lugar_desembarque.id_lugar
+Ref: armador.id_usuario > usuario.id_usuario
+Ref: embarcacion.id_armador > armador.id_armador
+Ref: permiso_pesca.id_embarcacion > embarcacion.id_embarcacion
+Ref: comprador.id_usuario > usuario.id_usuario
+Ref: talla_minima.id_especie > especie.id_especie
+Ref: veda.id_especie > especie.id_especie
+Ref: veda.id_zona > zona_pesca.id_zona
+Ref: permiso_especie.id_permiso > permiso_pesca.id_permiso
+Ref: permiso_especie.id_especie > especie.id_especie
+Ref: permiso_arte.id_permiso > permiso_pesca.id_permiso
+Ref: permiso_arte.id_arte > arte_pesca.id_arte
+Ref: aviso_arribo.id_embarcacion > embarcacion.id_embarcacion
+Ref: aviso_arribo.id_lugar > lugar_desembarque.id_lugar
+Ref: desembarque.id_embarcacion > embarcacion.id_embarcacion
+Ref: desembarque.id_lugar > lugar_desembarque.id_lugar
+Ref: desembarque.id_registrador > usuario.id_usuario
+Ref: desembarque.id_aviso > aviso_arribo.id_aviso
+Ref: desembarque.id_zona > zona_pesca.id_zona
+Ref: desembarque.id_arte > arte_pesca.id_arte
+Ref: desembarque.anulado_por > usuario.id_usuario
+Ref: detalle_desembarque.id_desembarque > desembarque.id_desembarque
+Ref: detalle_desembarque.id_especie > especie.id_especie
+Ref: muestreo_talla.id_detalle > detalle_desembarque.id_detalle
+Ref: evidencia_foto.id_desembarque > desembarque.id_desembarque
+Ref: resultado_validacion.id_desembarque > desembarque.id_desembarque
+Ref: constancia.id_desembarque > desembarque.id_desembarque
+Ref: lote_destino.id_detalle > detalle_desembarque.id_detalle
+Ref: lote_destino.id_comprador > comprador.id_comprador
+Ref: lote_destino.recibido_por > usuario.id_usuario
+Ref: inspeccion.id_desembarque > desembarque.id_desembarque
+Ref: inspeccion.id_fiscalizador > usuario.id_usuario
+Ref: alerta.id_desembarque > desembarque.id_desembarque
+Ref: alerta.id_permiso > permiso_pesca.id_permiso
+Ref: alerta.atendida_por > usuario.id_usuario
+Ref: cierre_diario.id_lugar > lugar_desembarque.id_lugar
+Ref: cierre_diario.cerrado_por > usuario.id_usuario

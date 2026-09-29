@@ -1,113 +1,188 @@
-# Especificación de Requerimientos - SIRDEPA
+# Requerimientos - SIRDEPA
 
-**Proyecto:** Vida Submarina (ODS 14)
-**Sistema:** SIRDEPA - Sistema de Registro de Desembarque Pesquero Artesanal
-**Curso:** Análisis y Diseño de Software - NRC 62152 - 2025
+**Sistema de Registro de Desembarque Pesquero Artesanal**
+ODS 14: Vida submarina · Análisis y Diseño de Software · 2026
+
+Este documento reúne los requerimientos del Capítulo 2 del informe. Cada requerimiento conserva su identificador, que se usa en los modelos, en la base de datos y en el backlog.
 
 ---
 
-## 1. Descripción del problema
+## 1. Problema
 
-En el Perú, la actividad pesquera enfrenta sobreexplotación de especies, pesca no regulada e ilegal y la ausencia de un monitoreo inmediato de las capturas y las áreas de faena. Esto pone en riesgo la biodiversidad marina, limita la sostenibilidad del recurso y perjudica a las comunidades costeras que dependen de la pesca.
+En los desembarcaderos y caletas del litoral peruano, el registro del desembarque de la pesca artesanal (qué especie se descargó, cuántos kilos, de qué embarcación, en qué zona, con qué arte y a quién se vendió) es **manual, fragmentado y tardío**. Por eso la información no es confiable, llega tarde a quienes toman decisiones y no permite trazar el origen del producto.
 
-El sector presenta una crisis multidimensional:
+Deficiencias del proceso actual (AS-IS):
 
-| Dimensión | Problema |
-|---|---|
-| Ambiental | Sobreexplotación de recursos y pérdida de biodiversidad marina |
-| Legal | Pesca ilegal, no declarada y no reglamentada |
-| Institucional | Deficiencia en el monitoreo y la fiscalización en tiempo real |
-| Socioeconómica | Vulnerabilidad de las comunidades pesqueras artesanales |
+1. **Captura extemporánea y duplicada:** comerciantes, observadores y fiscalizadores anotan por separado la misma descarga, en papel.
+2. **Cobertura de monitoreo limitada:** observadores presenciales solo en 63 puntos del litoral.
+3. **Falta de validación inmediata:** no hay controles automáticos de permisos, vedas o tallas al desembarcar.
+4. **Sin trazabilidad comercial:** los documentos físicos no se vinculan de forma verificable con el lote vendido.
+5. **Barrera tecnológica:** los sistemas actuales exigen correo y PC, ajenos al perfil artesanal.
 
-## 2. Solución propuesta
+**Beneficiario principal:** FONDEPES y la administración de los DPA. Piloto propuesto en un DPA de Piura.
 
-Un sistema de monitoreo pesquero que combina tecnología, gestión gubernamental y participación local:
+**Alcance:** embarcaciones artesanales y de menor escala (hasta 32,6 m³ de bodega), validación normativa, constancia con QR hasta el primer comprador y exportación a IMARPE y PRODUCE.
+**Fuera del alcance:** monitoreo satelital (SISESAT), facturación electrónica y reemplazo del SITRAPESCA.
 
-- Las embarcaciones cuentan con **GPS y bitácora digital**; sus datos llegan a una plataforma central administrada por **IMARPE y PRODUCE**.
-- Se integran **sensores marinos e imágenes satelitales** para controlar especies y áreas de captura.
-- Cada lote capturado recibe un **código QR** que certifica su procedencia legal (trazabilidad).
-- Las reglas de zonas, tallas, vedas y permisos se **validan automáticamente** y generan alertas.
+## 2. Interesados
 
-## 3. Actores y necesidades
+| Interesado | Tipo | Interés principal | Influencia |
+|---|---|---|---|
+| Registrador del DPA | Usuario directo | Registrar rápido, sin errores ni papeles | Alta |
+| Administrador del DPA / FONDEPES | Usuario directo y patrocinador | Estadística del muelle y control de la infraestructura | Alta |
+| Patrón / armador | Usuario directo | Constancia rápida y confidencialidad del caladero | Alta |
+| Comerciante / planta | Usuario directo | Comprar con prueba de origen legal | Media |
+| Fiscalizador (PRODUCE / DIREPRO) | Usuario directo | Verificar el origen y priorizar inspecciones | Alta |
+| Analista (IMARPE / PRODUCE) | Usuario indirecto | Datos oportunos, completos y comparables | Media |
+| Equipo de desarrollo | Proveedor | Requerimientos claros y priorizados | Media |
 
-### 3.1 Usuarios gubernamentales (IMARPE, PRODUCE)
-- Datos confiables y en tiempo real sobre la actividad pesquera.
-- Herramientas para fiscalización eficiente y toma de decisiones.
-- Sistemas de alerta temprana ante actividades ilegales.
-- Reportes automáticos para políticas públicas.
+## 3. Necesidades de los usuarios
 
-### 3.2 Armadores y empresas pesqueras
-- Documentación simplificada que no afecte su operatividad.
-- Certificación de legalidad para acceder a mercados.
-- Menores tiempos administrativos.
-- Protección frente a la competencia desleal de la pesca ilegal.
-
-### 3.3 Pescadores artesanales y comunidades costeras
-- Garantía de sostenibilidad del recurso a futuro.
-- Tecnología asequible y fácil de usar.
-- Valor agregado de sus productos mediante certificación.
-- Participación en la gestión de sus recursos.
-
-### 3.4 Organizaciones ambientales y de investigación
-- Transparencia en la información pesquera.
-- Indicadores de sostenibilidad y salud de los ecosistemas.
+| ID | Usuario | Necesidad |
+|---|---|---|
+| N01 | Registrador | Registrar un desembarque en pocos minutos, incluso sin señal |
+| N02 | Registrador | No volver a digitar embarcaciones, compradores ni vehículos frecuentes |
+| N03 | Patrón / armador | Obtener prueba del origen legal de su pesca sin trámites ni correo electrónico |
+| N04 | Patrón / armador | Proteger la ubicación de sus caladeros |
+| N05 | Patrón / armador | Contar con un historial de su esfuerzo pesquero |
+| N06 | Administrador del DPA | Saber cada día cuánto, qué y quién desembarca |
+| N07 | Fiscalizador | Verificar el origen en segundos y priorizar inspecciones |
+| N08 | Comerciante / planta | Demostrar que compró pesca de origen legal |
+| N09 | Analista IMARPE | Recibir datos de captura y esfuerzo estructurados y oportunos |
+| N10 | PRODUCE | Integrar la información con el SITRAPESCA sin doble digitación |
+| N11 | Todos | Usar una interfaz con el lenguaje propio del sector |
 
 ## 4. Requerimientos funcionales (RF)
 
-| ID | Requerimiento | Prioridad | Historias |
-|---|---|---|---|
-| RF01.1 | Registro automático de la posición GPS cada 15 minutos | Muy alta | HU03 |
-| RF01.2 | Alertas automáticas por ingreso a zonas restringidas | Muy alta | HU07, HU10 |
-| RF01.3 | Digitalización de las bitácoras de pesca | Muy alta | HU01, HU04 |
-| RF01.4 | Fotos digitales de las capturas como evidencia | Media | HU05 |
-| RF01.5 | Códigos QR únicos por lote de captura | Alta | HU06, HU13 |
-| RF01.6 | Monitoreo de condiciones meteorológicas | Media | HU14 |
-| RF01.7 | Notificaciones automáticas de irregularidades | Muy alta | HU10 |
+Prioridad MoSCoW: **M** indispensable, **S** deseable, **C** opcional.
+
+| ID | Requerimiento | Descripción | Prior. | Nec. |
+|---|---|---|---|---|
+| RF01 | Autenticación y roles | Ingreso con DNI, PIN y código de un solo uso por SMS; siete roles con permisos diferenciados; bloqueo tras intentos fallidos | M | N03, N11 |
+| RF02 | Gestión de embarcaciones | Registrar matrícula, nombre, tipo, eslora, capacidad de bodega, armador y categoría (artesanal o menor escala) | M | N06 |
+| RF03 | Gestión de permisos | Registrar permisos de pesca con resolución, entidad emisora, vigencia, especies y artes autorizados | M | N06, N07 |
+| RF04 | Catálogo normativo | Mantener especies (código FAO, talla mínima, tolerancia), artes, cuadrículas de pesca y vedas, con la norma que las sustenta | M | N11 |
+| RF05 | Aviso de arribo | Permitir al patrón informar hora estimada de llegada y captura aproximada | S | N01 |
+| RF06 | Registro de desembarque | Registrar embarcación, lugar, fechas de zarpe y arribo, zona de pesca, arte y número de tripulantes | M | N01 |
+| RF07 | Detalle por especie | Registrar por especie el peso en kg (o unidades), la presentación y el precio en playa | M | N01, N09 |
+| RF08 | Lectura de balanza | Capturar el peso desde una balanza digital por Bluetooth o USB | C | N01 |
+| RF09 | Muestreo de tallas | Registrar tallas de una muestra y calcular el % de ejemplares bajo la talla mínima | S | N09 |
+| RF10 | Validación normativa | Evaluar permiso vigente, especie y arte autorizados, veda, talla mínima, zona–arte y capacidad de bodega; clasificar como Conforme, Observado o No conforme sin bloquear el registro | M | N07 |
+| RF11 | Evidencia fotográfica | Adjuntar hasta tres fotografías comprimidas por desembarque | S | N07 |
+| RF12 | Trabajo sin conexión | Guardar el registro en el celular con identificador único (UUID) y sincronizarlo sin duplicados al recuperar la señal | M | N01 |
+| RF13 | Constancia digital con QR | Emitir constancia PDF con código único, QR y hash SHA-256, y enviar el enlace por SMS al armador | M | N03, N08 |
+| RF14 | Destino y lotes | Asignar kilos por especie a uno o más compradores, con vehículo, conductor y destino; mostrar el saldo pendiente | M | N02, N08 |
+| RF15 | Recepción del lote | Permitir que el comprador confirme la recepción escaneando el QR | S | N08 |
+| RF16 | Verificación pública | Mostrar, al escanear el QR, si la constancia es válida y un resumen sin datos personales sensibles | M | N07, N08 |
+| RF17 | Observaciones de fiscalización | Registrar observaciones o actas vinculadas al desembarque | S | N07 |
+| RF18 | Tablero de indicadores | Mostrar kilos por día, especie, embarcación y arte, porcentaje de conformidad y alertas | M | N06 |
+| RF19 | Reportes y exportación | Generar reportes en Excel, CSV y PDF, incluido el reporte mensual de captura y esfuerzo para el IMARPE | M | N09 |
+| RF20 | Interoperabilidad SITRAPESCA | Exportar los datos en la estructura del módulo de descarga del SITRAPESCA y ofrecer una API documentada | S | N10 |
+| RF21 | Historial del armador | Consultar desembarques propios y descargar constancias | S | N05 |
+| RF22 | Notificaciones | Alertar al fiscalizador ante un desembarque No conforme y avisar al armador 30 días antes del vencimiento de su permiso | S | N07 |
+| RF23 | Anulación y auditoría | Anular un desembarque solo con motivo y rol autorizado; registrar toda creación, edición o anulación | M | N07 |
+| RF24 | Cierre diario | Consolidar el día y cuadrar kilos registrados frente a kilos despachados | C | N06 |
 
 ## 5. Requerimientos no funcionales (RNF)
 
-| ID | Requerimiento | Categoría | Cómo se atiende en el diseño |
+Estructurados según el modelo de calidad ISO/IEC 25010:2023.
+
+| ID | Característica | Requerimiento | Criterio de aceptación |
 |---|---|---|---|
-| RNF 01.1 | Tiempo de respuesta menor a 3 segundos para consultas | Rendimiento | Índices B-tree y GIST en PostgreSQL; vistas para reportes |
-| RNF 01.2 | Autenticación de dos factores para usuarios críticos | Seguridad | Restricción `ck_usuario_2fa_criticos` en la tabla `usuario` |
-| RNF 01.3 | Disponibilidad del 99.5 % en horario laboral | Disponibilidad | Arquitectura cliente-servidor con API REST desacoplada |
-| RNF 01.4 | Capacidad de crecimiento hasta 10 000 embarcaciones | Escalabilidad | Claves `BIGSERIAL` en tablas de alto volumen e índices por embarcación y fecha |
+| RNF01 | Capacidad de interacción | Registro rápido por un registrador capacitado | Desembarque con hasta tres especies en ≤ 3 minutos y ≤ 5 pantallas |
+| RNF02 | Capacidad de interacción | Interfaz legible a pleno sol y operable con manos húmedas | Botones de al menos 48 × 48 dp; contraste ≥ 4,5:1 (WCAG 2.1 AA) |
+| RNF03 | Capacidad de interacción | Lenguaje del sector, sin siglas técnicas | Etiquetas validadas con usuarios; capacitación del registrador en ≤ 2 horas |
+| RNF04 | Eficiencia de desempeño | Tiempo de respuesta de los servicios | Percentil 95 ≤ 2 s con 200 usuarios concurrentes; tablero ≤ 5 s |
+| RNF05 | Eficiencia de desempeño | Aplicación liviana para celulares de gama baja | ≤ 40 MB instalada; Android 8.0+ con 2 GB de RAM; ≤ 200 KB por desembarque sin fotos; fotos ≤ 300 KB |
+| RNF06 | Fiabilidad | Disponibilidad del servicio central | ≥ 99,5 % mensual; registro en el celular disponible aun sin conexión |
+| RNF07 | Fiabilidad | Ningún registro se pierde ni se duplica | Persistencia local antes de confirmar; sincronización idempotente por UUID; 0 duplicados en pruebas de corte de red |
+| RNF08 | Seguridad | Acceso seguro sin correo electrónico | DNI + PIN + código por SMS; PIN con Argon2 o bcrypt; bloqueo tras 5 intentos |
+| RNF09 | Seguridad | Protección de datos personales y de caladeros | Ley 29733 y su reglamento; TLS 1.2+; zona visible solo para roles autorizados; datos anonimizados en exportaciones abiertas |
+| RNF10 | Seguridad | Integridad y no repudio | Constancia con hash SHA-256 verificado en el servidor; bitácora inmutable de cambios |
+| RNF11 | Compatibilidad | Intercambio de datos estándar | API REST con OpenAPI 3; CSV/JSON; fechas ISO 8601; especies con código 3-alfa ASFIS de la FAO |
+| RNF12 | Mantenibilidad | Reglas y código fáciles de modificar | Tallas y vedas parametrizables sin programar; cobertura de pruebas ≥ 70 % en el motor de reglas |
+| RNF13 | Flexibilidad | Escalar del piloto a todo el litoral | ≥ 60 lugares de desembarque y ≥ 25 000 embarcaciones sin rediseño |
+| RNF14 | Flexibilidad | Portabilidad de la aplicación web | Chrome, Edge y Firefox (dos últimas versiones) y diseño adaptable a celular |
 
 ## 6. Requerimientos de dominio (RD)
 
-| ID | Requerimiento | Cómo se atiende |
+| ID | Requerimiento | Fuente |
 |---|---|---|
-| RD01 | Cumplimiento del D.S. 012-2001-PE (Reglamento de la Ley General de Pesca) y modificatorias | Tablas `permiso`, `veda`, `zona` y `especie` con validación automática |
-| RD09 | Procesos simplificados que no retrasen las operaciones pesqueras | App móvil con modo offline y sincronización por lotes |
-| RD17 | Monitoreo de indicadores de sostenibilidad pesquera | Vistas `v_avance_cuota` y `v_desembarque_por_especie` |
+| RD01 | Solo son artesanales las embarcaciones de hasta 32,6 m³ de bodega y 15 m de eslora con predominio del trabajo manual; las de igual tamaño con sistemas mecanizados son de menor escala | D.S. N.° 002-2025-PRODUCE |
+| RD02 | Los titulares de embarcaciones deben informar sus capturas por especie y zona de pesca | Art. 66 del D.L. N.° 25977, Ley General de Pesca |
+| RD03 | Cada especie tiene talla mínima de captura y tolerancia de juveniles, que se actualizan cuando una resolución las modifica | R.M. N.° 209-2001-PE y modificatorias |
+| RD04 | Las vedas, temporadas y zonas de pesca las fija la autoridad sobre la base de evidencia científica; se registran con su norma y vigencia | Ley General de Pesca, art. 9 |
+| RD05 | La descarga debe registrar punto de desembarque, embarcación, código de faena, fecha y hora, tipo de transporte, DNI del conductor, placa y destino, como en el módulo de descarga del SITRAPESCA | D.S. N.° 024-2021-PRODUCE |
+| RD06 | Las embarcaciones de hasta 32,6 m³ deben comunicar la información de sus faenas y calas | R.M. N.° 207-2025-PRODUCE |
+| RD07 | Toda descarga debe contar con documentación física o electrónica que acredite su origen legal y trazabilidad | D.S. N.° 006-2025-PRODUCE |
+| RD08 | La franja de 0 a 5 millas está reservada a la pesca artesanal y de menor escala, y en las 3 primeras millas no se permite el cerco mecanizado; una combinación zona–arte incompatible se marca como observada | D.S. N.° 002-2025-PRODUCE |
+| RD09 | El registro de pescadores no embarcados es voluntario, pues la obligación de informar recae en embarcaciones y plantas | Oceana Perú (2025) |
+| RD10 | Los datos personales se tratan con consentimiento, finalidad determinada y medidas de seguridad | Ley N.° 29733 y D.S. N.° 016-2024-JUS |
 
-## 7. Reglas de negocio validadas automáticamente
+## 7. Casos de uso generales
 
-| Regla | Disparador | Alerta generada |
-|---|---|---|
-| Una embarcación no debe estar dentro de una zona restringida vigente | Nueva posición GPS | `ZONA_RESTRINGIDA` (Alta) |
-| La talla promedio debe ser mayor o igual a la talla mínima de la especie | Nuevo detalle de captura | `TALLA_MINIMA` (Media) |
-| No se captura una especie durante su periodo de veda | Nuevo detalle de captura | `VEDA` (Alta) |
-| Toda captura requiere un permiso vigente de la embarcación | Nueva captura | `PERMISO_VENCIDO` (Crítica) |
+| ID | Caso de uso | Actor principal | RF |
+|---|---|---|---|
+| CU01 | Iniciar sesión (DNI + PIN + OTP) | Todos | RF01 |
+| CU02 | Gestionar embarcaciones y permisos | Administrador del DPA | RF02, RF03 |
+| CU03 | Gestionar catálogos normativos | Administrador del DPA | RF04 |
+| CU04 | Registrar aviso de arribo | Patrón / armador | RF05 |
+| CU05 | Registrar desembarque (extensiones: muestreo de tallas, evidencia fotográfica) | Registrador del DPA | RF06–RF09, RF11 |
+| CU06 | Validar cumplimiento normativo (incluido en CU05) | Sistema | RF10, RF22 |
+| CU07 | Emitir constancia digital con QR (incluido en CU05) | Sistema | RF13 |
+| CU08 | Registrar destino y lotes | Registrador del DPA | RF14 |
+| CU09 | Confirmar recepción de lote (incluye CU10) | Comerciante | RF15 |
+| CU10 | Verificar constancia por QR | Comerciante, fiscalizador | RF16 |
+| CU11 | Registrar observación de fiscalización (extiende CU10) | Fiscalizador | RF17 |
+| CU12 | Consultar historial y constancias | Patrón / armador | RF21 |
+| CU13 | Consultar tablero de indicadores | Administrador del DPA, analista | RF18, RF24 |
+| CU14 | Generar y exportar reportes | Analista; SITRAPESCA | RF19, RF20 |
+| CU15 | Sincronizar registros fuera de línea | Registrador del DPA | RF12 |
+| CU16 | Anular desembarque | Administrador del DPA | RF23 |
 
-La implementación está en `base-de-datos/sirdepa_schema.sql` (sección 13).
+Actores externos que son sistemas: **SITRAPESCA** (PRODUCE) y **Pasarela SMS**.
 
 ## 8. Matriz de trazabilidad
 
-| Requerimiento | Caso de uso | Tablas principales |
-|---|---|---|
-| RF01.1 | Enviar posición GPS | `posicion_gps` |
-| RF01.2 | Generar alertas | `zona`, `alerta` |
-| RF01.3 | Registrar captura en bitácora | `captura`, `detalle_captura` |
-| RF01.4 | Adjuntar fotos de evidencia | `evidencia_foto` |
-| RF01.5 | Generar lote y código QR / Verificar trazabilidad | `lote`, `v_trazabilidad_lote` |
-| RF01.6 | Monitoreo meteorológico | `sensor_registro` |
-| RF01.7 | Generar alertas / Auditoría | `alerta`, `auditoria` |
-| RD01 | Gestionar zonas, vedas y cuotas | `permiso`, `veda`, `especie` |
+Relaciona cada requerimiento funcional con su necesidad, caso de uso, historia de usuario, entrega y el objeto de la base de datos que lo soporta (`base-de-datos/sirdepa_schema.sql`).
 
-## 9. Documentos relacionados
+| RF | Necesidad | Caso de uso | Historia | Entrega | Base de datos |
+|---|---|---|---|---|---|
+| RF01 | N03, N11 | CU01 | HU01, HU02 | Sprint 1 | `usuario`, `rol` |
+| RF02 | N06 | CU02 | HU03 | Sprint 1 | `embarcacion`, `armador` |
+| RF03 | N06, N07 | CU02 | HU04 | Sprint 1 | `permiso_pesca`, `permiso_especie`, `permiso_arte` |
+| RF04 | N11 | CU03 | HU05 | Sprint 1 | `especie`, `talla_minima`, `arte_pesca`, `zona_pesca`, `veda` |
+| RF05 | N01 | CU04 | HU20 | Release 2 | `aviso_arribo` |
+| RF06 | N01 | CU05 | HU06 | Sprint 1 | `desembarque` |
+| RF07 | N01, N09 | CU05 | HU07 | Sprint 1 | `detalle_desembarque` |
+| RF08 | N01 | CU05 | HU22 | Release 2 | (aplicación móvil) |
+| RF09 | N09 | CU05 (extensión) | HU10 | Sprint 2 | `muestreo_talla` |
+| RF10 | N07 | CU06 | HU09 | Sprint 2 | `validar_desembarque()`, `resultado_validacion` |
+| RF11 | N07 | CU05 (extensión) | HU23 | Release 2 | `evidencia_foto` |
+| RF12 | N01 | CU15 | HU08 | Sprint 2 | `desembarque.id_desembarque` (UUID) |
+| RF13 | N03, N08 | CU07 | HU11 | Sprint 2 | `emitir_constancia()`, `constancia` |
+| RF14 | N02, N08 | CU08 | HU12 | Sprint 2 | `lote_destino`, `v_saldo_detalle` |
+| RF15 | N08 | CU09 | HU14 | Release 2 | `lote_destino.estado` |
+| RF16 | N07, N08 | CU10 | HU13 | Sprint 2 | `v_verificacion_publica` |
+| RF17 | N07 | CU11 | HU15 | Release 2 | `inspeccion` |
+| RF18 | N06 | CU13 | HU16 | Release 2 | `v_tablero_diario` |
+| RF19 | N09 | CU14 | HU17 | Release 2 | `v_reporte_imarpe` |
+| RF20 | N10 | CU14 | HU18 | Release 2 | `v_export_sitrapesca` |
+| RF21 | N05 | CU12 | HU19 | Release 2 | `desembarque`, `constancia` |
+| RF22 | N07 | CU06 | HU15 | Release 2 | `alerta`, `v_permisos_por_vencer` |
+| RF23 | N07 | CU16 | HU21 | Release 2 | `anular_desembarque()`, `auditoria` |
+| RF24 | N06 | CU13 | HU24 | Release 2 | `cierre_diario` |
 
-- Diagramas: [`../diagramas`](../diagramas)
-- Modelo de datos: [`../base-de-datos`](../base-de-datos)
-- Backlog del producto: [`../backlog/backlog.md`](../backlog/backlog.md)
-- Prototipos: [`./prototipos`](./prototipos)
+## 9. Reglas del motor de validación
+
+La validación no bloquea el registro: guarda el resultado de cada regla y clasifica el desembarque con el peor nivel encontrado.
+
+| Regla | Qué verifica | Nivel si falla | Sustento |
+|---|---|---|---|
+| PERMISO_VIGENTE | La embarcación tiene permiso vigente en la fecha del arribo | No conforme | Ley General de Pesca |
+| ESPECIE_AUTORIZADA | El permiso autoriza cada especie desembarcada | No conforme | Permiso de pesca |
+| ARTE_AUTORIZADO | El permiso autoriza el arte empleado | No conforme | Permiso de pesca |
+| VEDA | Ninguna especie está en veda en esa fecha y zona | No conforme | RD04 |
+| TALLA_MINIMA | El % de la muestra bajo la talla mínima vigente no supera la tolerancia | Observado | RD03 |
+| ZONA_ARTE | No hay cerco mecanizado dentro de las 3 millas | Observado | RD08 |
+| CAPACIDAD_BODEGA | Los kilos no superan lo que admite la bodega declarada | Observado | RD01 |

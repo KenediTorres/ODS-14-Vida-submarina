@@ -1,199 +1,354 @@
 {
   "sistema": "SIRDEPA - Sistema de Registro de Desembarque Pesquero Artesanal",
-  "proyecto": "Vida Submarina (ODS 14)",
+  "proyecto": "ODS 14: Vida submarina",
   "motor": "PostgreSQL 16 + PostGIS 3",
   "esquema": "sirdepa",
-  "version": "1.0.0",
-  "generado": "2026-09-28",
+  "version": "2.0.0",
   "fuente": "base-de-datos/sirdepa_schema.sql",
+  "nota": "Generado automáticamente desde la base de datos cargada con sirdepa_schema.sql; las descripciones provienen de los COMMENT ON del script.",
+  "resumen": {
+    "tablas": 27,
+    "columnas": 180,
+    "vistas": 6,
+    "funciones": 4,
+    "triggers": 13,
+    "enumeraciones": 6
+  },
   "tablas": [
     {
-      "tabla": "usuario",
-      "descripcion": "Usuarios que acceden al sistema (IMARPE, PRODUCE, inspectores, armadores, pescadores).",
-      "requerimiento": "RNF 01.2",
+      "tabla": "parametro",
+      "descripcion": "Parámetros del motor de reglas que se ajustan sin programar (RNF12).",
       "columnas": [
         {
-          "columna": "id_usr",
-          "tipo": "integer",
+          "columna": "clave",
+          "tipo": "character varying(60)",
           "nulo": false,
-          "por_defecto": "nextval('sirdepa.usuario_id_usr_seq'::regclass)",
-          "generada": false,
           "pk": true,
           "unico": false,
-          "descripcion": "Identificador del usuario"
+          "descripcion": "Nombre del parámetro"
+        },
+        {
+          "columna": "valor",
+          "tipo": "numeric",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Valor numérico"
+        },
+        {
+          "columna": "descripcion",
+          "tipo": "text",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Para qué sirve el parámetro"
+        }
+      ],
+      "restricciones": []
+    },
+    {
+      "tabla": "rol",
+      "descripcion": "Siete roles con permisos diferenciados (RF01).",
+      "columnas": [
+        {
+          "columna": "id_rol",
+          "tipo": "smallint",
+          "nulo": false,
+          "por_defecto": "nextval('sirdepa.rol_id_rol_seq'::regclass)",
+          "pk": true,
+          "unico": false,
+          "descripcion": "Identificador del rol"
+        },
+        {
+          "columna": "codigo",
+          "tipo": "character varying(20)",
+          "nulo": false,
+          "pk": false,
+          "unico": true,
+          "descripcion": "Código del rol (REGISTRADOR, ADMIN_DPA, ...)"
+        },
+        {
+          "columna": "nombre",
+          "tipo": "character varying(60)",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Nombre visible del rol"
+        }
+      ],
+      "restricciones": []
+    },
+    {
+      "tabla": "lugar_desembarque",
+      "descripcion": "DPA, caletas y puntos donde la pesca artesanal llega a tierra.",
+      "columnas": [
+        {
+          "columna": "id_lugar",
+          "tipo": "integer",
+          "nulo": false,
+          "por_defecto": "nextval('sirdepa.lugar_desembarque_id_lugar_seq'::regclass)",
+          "pk": true,
+          "unico": false,
+          "descripcion": "Identificador del lugar"
+        },
+        {
+          "columna": "codigo",
+          "tipo": "character varying(20)",
+          "nulo": false,
+          "pk": false,
+          "unico": true,
+          "descripcion": "Código único del lugar"
         },
         {
           "columna": "nombre",
           "tipo": "character varying(120)",
           "nulo": false,
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Nombre descriptivo"
+          "descripcion": "Nombre del DPA o caleta"
         },
         {
-          "columna": "email",
-          "tipo": "character varying(150)",
+          "columna": "tipo",
+          "tipo": "character varying(20)",
           "nulo": false,
-          "generada": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "DPA, CALETA o PUNTO_DESEMBARQUE"
+        },
+        {
+          "columna": "region",
+          "tipo": "character varying(40)",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Región"
+        },
+        {
+          "columna": "ubicacion",
+          "tipo": "geometry(Point,4326)",
+          "nulo": true,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Punto geográfico WGS84 (SRID 4326)"
+        }
+      ],
+      "restricciones": [
+        {
+          "nombre": "lugar_desembarque_tipo_check",
+          "definicion": "CHECK (((tipo)::text = ANY ((ARRAY['DPA'::character varying, 'CALETA'::character varying, 'PUNTO_DESEMBARQUE'::character varying])::text[])))"
+        }
+      ]
+    },
+    {
+      "tabla": "usuario",
+      "descripcion": "Persona autenticada con DNI, PIN y código por SMS (RF01, RNF08).",
+      "columnas": [
+        {
+          "columna": "id_usuario",
+          "tipo": "uuid",
+          "nulo": false,
+          "por_defecto": "gen_random_uuid()",
+          "pk": true,
+          "unico": false,
+          "descripcion": "Identificador UUID del usuario"
+        },
+        {
+          "columna": "dni",
+          "tipo": "character(8)",
+          "nulo": false,
           "pk": false,
           "unico": true,
-          "descripcion": "Correo electrónico de acceso (único)"
+          "descripcion": "DNI de 8 dígitos, único"
         },
         {
-          "columna": "password_hash",
+          "columna": "nombres",
+          "tipo": "character varying(120)",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Nombres y apellidos"
+        },
+        {
+          "columna": "celular",
+          "tipo": "character varying(15)",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Celular que recibe el código OTP por SMS"
+        },
+        {
+          "columna": "pin_hash",
           "tipo": "character varying(255)",
           "nulo": false,
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Hash de la contraseña (bcrypt/argon2); nunca texto plano"
+          "descripcion": "PIN cifrado con Argon2 o bcrypt"
         },
         {
-          "columna": "rol",
-          "tipo": "sirdepa.rol_usuario",
+          "columna": "id_rol",
+          "tipo": "smallint",
           "nulo": false,
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Rol que determina permisos en el sistema"
+          "fk": {
+            "tabla": "rol",
+            "columna": "id_rol"
+          },
+          "descripcion": "Rol asignado"
         },
         {
-          "columna": "auth_2fa",
-          "tipo": "boolean",
-          "nulo": false,
-          "por_defecto": "false",
-          "generada": false,
+          "columna": "id_lugar",
+          "tipo": "integer",
+          "nulo": true,
           "pk": false,
           "unico": false,
-          "descripcion": "Indica si el usuario tiene autenticación de dos factores activa"
+          "fk": {
+            "tabla": "lugar_desembarque",
+            "columna": "id_lugar"
+          },
+          "descripcion": "DPA asignado"
         },
         {
           "columna": "activo",
           "tipo": "boolean",
           "nulo": false,
           "por_defecto": "true",
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Usuario habilitado para ingresar"
+          "descripcion": "Usuario habilitado"
+        },
+        {
+          "columna": "intentos_fallidos",
+          "tipo": "smallint",
+          "nulo": false,
+          "por_defecto": "0",
+          "pk": false,
+          "unico": false,
+          "descripcion": "Intentos fallidos consecutivos de ingreso"
+        },
+        {
+          "columna": "bloqueado_hasta",
+          "tipo": "timestamp with time zone",
+          "nulo": true,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Fin del bloqueo temporal tras 5 intentos fallidos"
         },
         {
           "columna": "creado_en",
           "tipo": "timestamp with time zone",
           "nulo": false,
           "por_defecto": "now()",
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Fecha y hora de creación del registro"
+          "descripcion": "Fecha de creación"
         }
       ],
       "restricciones": [
-        "CHECK (((email)::text ~* '^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$'::text))",
-        "CHECK (((rol <> ALL (ARRAY['ADMIN'::sirdepa.rol_usuario, 'IMARPE'::sirdepa.rol_usuario, 'PRODUCE'::sirdepa.rol_usuario, 'INSPECTOR'::sirdepa.rol_usuario])) OR auth_2fa))"
+        {
+          "nombre": "usuario_celular_check",
+          "definicion": "CHECK (((celular)::text ~ '^\\+?[0-9]{9,14}$'::text))"
+        },
+        {
+          "nombre": "usuario_dni_check",
+          "definicion": "CHECK ((dni ~ '^[0-9]{8}$'::text))"
+        },
+        {
+          "nombre": "usuario_intentos_fallidos_check",
+          "definicion": "CHECK ((intentos_fallidos >= 0))"
+        }
       ]
     },
     {
-      "tabla": "pescador",
-      "descripcion": "Pescadores artesanales y propietarios de embarcaciones.",
-      "requerimiento": null,
+      "tabla": "armador",
+      "descripcion": "Titular de embarcaciones; recibe la constancia por SMS.",
       "columnas": [
         {
-          "columna": "id_pesc",
+          "columna": "id_armador",
           "tipo": "integer",
           "nulo": false,
-          "por_defecto": "nextval('sirdepa.pescador_id_pesc_seq'::regclass)",
-          "generada": false,
+          "por_defecto": "nextval('sirdepa.armador_id_armador_seq'::regclass)",
           "pk": true,
           "unico": false,
-          "descripcion": "Identificador del pescador"
+          "descripcion": "Identificador del armador"
         },
         {
-          "columna": "id_usr",
-          "tipo": "integer",
+          "columna": "tipo_documento",
+          "tipo": "character varying(3)",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "DNI, CE o RUC"
+        },
+        {
+          "columna": "numero_documento",
+          "tipo": "character varying(11)",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Número de documento"
+        },
+        {
+          "columna": "nombre",
+          "tipo": "character varying(150)",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Nombre o razón social"
+        },
+        {
+          "columna": "celular",
+          "tipo": "character varying(15)",
           "nulo": true,
-          "generada": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Celular donde recibe el enlace de la constancia"
+        },
+        {
+          "columna": "id_usuario",
+          "tipo": "uuid",
+          "nulo": true,
           "pk": false,
           "unico": true,
           "fk": {
             "tabla": "usuario",
-            "columna": "id_usr"
+            "columna": "id_usuario"
           },
-          "descripcion": "Identificador del usuario"
+          "descripcion": "Cuenta de acceso para consultar su historial (opcional)"
         },
         {
-          "columna": "nombre",
-          "tipo": "character varying(120)",
-          "nulo": false,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Nombre descriptivo"
-        },
-        {
-          "columna": "tipo_documento",
-          "tipo": "character varying(10)",
-          "nulo": false,
-          "por_defecto": "'DNI'::character varying",
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Tipo de documento de identidad (DNI, CE, RUC)"
-        },
-        {
-          "columna": "documento",
-          "tipo": "character varying(15)",
-          "nulo": false,
-          "generada": false,
-          "pk": false,
-          "unico": true,
-          "descripcion": "Número de documento de identidad"
-        },
-        {
-          "columna": "comunidad",
-          "tipo": "character varying(120)",
-          "nulo": true,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Caleta o comunidad pesquera de origen"
-        },
-        {
-          "columna": "contacto",
-          "tipo": "character varying(60)",
-          "nulo": true,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Teléfono u otro medio de contacto"
-        },
-        {
-          "columna": "creado_en",
+          "columna": "consentimiento_en",
           "tipo": "timestamp with time zone",
-          "nulo": false,
-          "por_defecto": "now()",
-          "generada": false,
+          "nulo": true,
           "pk": false,
           "unico": false,
-          "descripcion": "Fecha y hora de creación del registro"
+          "descripcion": "Fecha del consentimiento para el tratamiento de datos personales (Ley 29733)"
         }
       ],
       "restricciones": [
-        "CHECK (((tipo_documento)::text = ANY ((ARRAY['DNI'::character varying, 'CE'::character varying, 'RUC'::character varying])::text[])))"
+        {
+          "nombre": "armador_celular_check",
+          "definicion": "CHECK (((celular)::text ~ '^\\+?[0-9]{9,14}$'::text))"
+        },
+        {
+          "nombre": "armador_tipo_documento_check",
+          "definicion": "CHECK (((tipo_documento)::text = ANY ((ARRAY['DNI'::character varying, 'CE'::character varying, 'RUC'::character varying])::text[])))"
+        },
+        {
+          "nombre": "armador_tipo_documento_numero_documento_key",
+          "definicion": "UNIQUE (tipo_documento, numero_documento)"
+        }
       ]
     },
     {
       "tabla": "embarcacion",
-      "descripcion": "Embarcaciones pesqueras registradas y monitoreadas.",
-      "requerimiento": "HU01",
+      "descripcion": "Embarcación artesanal o de menor escala de hasta 32,6 m³ de bodega (RF02, RD01).",
       "columnas": [
         {
-          "columna": "id_emb",
+          "columna": "id_embarcacion",
           "tipo": "integer",
           "nulo": false,
-          "por_defecto": "nextval('sirdepa.embarcacion_id_emb_seq'::regclass)",
-          "generada": false,
+          "por_defecto": "nextval('sirdepa.embarcacion_id_embarcacion_seq'::regclass)",
           "pk": true,
           "unico": false,
           "descripcion": "Identificador de la embarcación"
@@ -202,135 +357,328 @@
           "columna": "matricula",
           "tipo": "character varying(20)",
           "nulo": false,
-          "generada": false,
           "pk": false,
           "unico": true,
-          "descripcion": "Matrícula oficial de la embarcación"
+          "descripcion": "Matrícula única"
         },
         {
           "columna": "nombre",
           "tipo": "character varying(100)",
           "nulo": false,
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Nombre descriptivo"
-        },
-        {
-          "columna": "tipo",
-          "tipo": "sirdepa.tipo_embarcacion",
-          "nulo": false,
-          "por_defecto": "'ARTESANAL'::sirdepa.tipo_embarcacion",
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Clasificación del registro"
+          "descripcion": "Nombre de la embarcación"
         },
         {
           "columna": "eslora_m",
           "tipo": "numeric(5,2)",
-          "nulo": true,
-          "generada": false,
+          "nulo": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Eslora (longitud) en metros"
+          "descripcion": "Eslora en metros"
         },
         {
           "columna": "capacidad_bodega_m3",
-          "tipo": "numeric(7,2)",
-          "nulo": true,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Capacidad de bodega en m³"
-        },
-        {
-          "columna": "estado",
-          "tipo": "sirdepa.estado_embarcacion",
+          "tipo": "numeric(6,2)",
           "nulo": false,
-          "por_defecto": "'ACTIVA'::sirdepa.estado_embarcacion",
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Estado actual del registro"
+          "descripcion": "Capacidad de bodega en m³ (máximo 32,6)"
         },
         {
-          "columna": "owner_id",
+          "columna": "trabajo_manual",
+          "tipo": "boolean",
+          "nulo": false,
+          "por_defecto": "true",
+          "pk": false,
+          "unico": false,
+          "descripcion": "Predominio del trabajo manual"
+        },
+        {
+          "columna": "categoria",
+          "tipo": "sirdepa.categoria_pesca",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "ARTESANAL o MENOR_ESCALA"
+        },
+        {
+          "columna": "id_armador",
           "tipo": "integer",
           "nulo": false,
-          "generada": false,
           "pk": false,
           "unico": false,
           "fk": {
-            "tabla": "pescador",
-            "columna": "id_pesc"
+            "tabla": "armador",
+            "columna": "id_armador"
           },
-          "descripcion": "Pescador propietario de la embarcación"
+          "descripcion": "Armador titular"
         },
         {
-          "columna": "creado_en",
-          "tipo": "timestamp with time zone",
+          "columna": "activa",
+          "tipo": "boolean",
           "nulo": false,
-          "por_defecto": "now()",
-          "generada": false,
+          "por_defecto": "true",
           "pk": false,
           "unico": false,
-          "descripcion": "Fecha y hora de creación del registro"
+          "descripcion": "Embarcación habilitada"
         }
       ],
       "restricciones": [
-        "CHECK ((eslora_m > (0)::numeric))",
-        "CHECK ((capacidad_bodega_m3 >= (0)::numeric))"
+        {
+          "nombre": "ck_alcance_bodega",
+          "definicion": "CHECK ((capacidad_bodega_m3 <= 32.6))"
+        },
+        {
+          "nombre": "ck_categoria_artesanal",
+          "definicion": "CHECK (((categoria <> 'ARTESANAL'::sirdepa.categoria_pesca) OR ((capacidad_bodega_m3 <= 32.6) AND (eslora_m <= (15)::numeric) AND trabajo_manual)))"
+        },
+        {
+          "nombre": "embarcacion_capacidad_bodega_m3_check",
+          "definicion": "CHECK ((capacidad_bodega_m3 > (0)::numeric))"
+        },
+        {
+          "nombre": "embarcacion_eslora_m_check",
+          "definicion": "CHECK ((eslora_m > (0)::numeric))"
+        }
       ]
     },
     {
-      "tabla": "zona",
-      "descripcion": "Polígonos de zonas de pesca: permitidas, restringidas, reservas y vedas espaciales.",
-      "requerimiento": "RF01.2",
+      "tabla": "permiso_pesca",
+      "descripcion": "Permiso de pesca con resolución, entidad emisora y vigencia (RF03).",
       "columnas": [
         {
-          "columna": "id_zona",
+          "columna": "id_permiso",
           "tipo": "integer",
           "nulo": false,
-          "por_defecto": "nextval('sirdepa.zona_id_zona_seq'::regclass)",
-          "generada": false,
+          "por_defecto": "nextval('sirdepa.permiso_pesca_id_permiso_seq'::regclass)",
           "pk": true,
           "unico": false,
-          "descripcion": "Identificador de la zona"
+          "descripcion": "Identificador del permiso"
+        },
+        {
+          "columna": "id_embarcacion",
+          "tipo": "integer",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "fk": {
+            "tabla": "embarcacion",
+            "columna": "id_embarcacion"
+          },
+          "descripcion": "Embarcación autorizada"
+        },
+        {
+          "columna": "numero_resolucion",
+          "tipo": "character varying(60)",
+          "nulo": false,
+          "pk": false,
+          "unico": true,
+          "descripcion": "Número de la resolución que otorga el permiso"
+        },
+        {
+          "columna": "entidad_emisora",
+          "tipo": "character varying(80)",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "PRODUCE o Gobierno Regional (DIREPRO)"
+        },
+        {
+          "columna": "fecha_emision",
+          "tipo": "date",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Inicio de vigencia"
+        },
+        {
+          "columna": "fecha_vencimiento",
+          "tipo": "date",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Fin de vigencia"
+        }
+      ],
+      "restricciones": [
+        {
+          "nombre": "ck_permiso_fechas",
+          "definicion": "CHECK ((fecha_vencimiento >= fecha_emision))"
+        }
+      ]
+    },
+    {
+      "tabla": "comprador",
+      "descripcion": "Comerciante, planta o mercado que recibe lotes (RF14).",
+      "columnas": [
+        {
+          "columna": "id_comprador",
+          "tipo": "integer",
+          "nulo": false,
+          "por_defecto": "nextval('sirdepa.comprador_id_comprador_seq'::regclass)",
+          "pk": true,
+          "unico": false,
+          "descripcion": "Identificador del comprador"
+        },
+        {
+          "columna": "tipo_documento",
+          "tipo": "character varying(3)",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "DNI, CE o RUC"
+        },
+        {
+          "columna": "numero_documento",
+          "tipo": "character varying(11)",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Número de documento"
         },
         {
           "columna": "nombre",
-          "tipo": "character varying(120)",
+          "tipo": "character varying(150)",
           "nulo": false,
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Nombre descriptivo"
+          "descripcion": "Nombre o razón social"
         },
         {
           "columna": "tipo",
-          "tipo": "sirdepa.tipo_zona",
+          "tipo": "character varying(20)",
           "nulo": false,
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Clasificación del registro"
+          "descripcion": "COMERCIANTE, PLANTA, MERCADO o CONSUMIDOR"
         },
         {
-          "columna": "norma_legal",
-          "tipo": "character varying(120)",
+          "columna": "id_usuario",
+          "tipo": "uuid",
           "nulo": true,
-          "generada": false,
+          "pk": false,
+          "unico": true,
+          "fk": {
+            "tabla": "usuario",
+            "columna": "id_usuario"
+          },
+          "descripcion": "Cuenta para confirmar la recepción de lotes"
+        }
+      ],
+      "restricciones": [
+        {
+          "nombre": "comprador_tipo_check",
+          "definicion": "CHECK (((tipo)::text = ANY ((ARRAY['COMERCIANTE'::character varying, 'PLANTA'::character varying, 'MERCADO'::character varying, 'CONSUMIDOR'::character varying])::text[])))"
+        },
+        {
+          "nombre": "comprador_tipo_documento_check",
+          "definicion": "CHECK (((tipo_documento)::text = ANY ((ARRAY['DNI'::character varying, 'CE'::character varying, 'RUC'::character varying])::text[])))"
+        },
+        {
+          "nombre": "comprador_tipo_documento_numero_documento_key",
+          "definicion": "UNIQUE (tipo_documento, numero_documento)"
+        }
+      ]
+    },
+    {
+      "tabla": "especie",
+      "descripcion": "Especie hidrobiológica con código 3-alfa ASFIS de la FAO (RF04, RNF11).",
+      "columnas": [
+        {
+          "columna": "id_especie",
+          "tipo": "integer",
+          "nulo": false,
+          "por_defecto": "nextval('sirdepa.especie_id_especie_seq'::regclass)",
+          "pk": true,
+          "unico": false,
+          "descripcion": "Identificador de la especie"
+        },
+        {
+          "columna": "codigo_fao",
+          "tipo": "character(3)",
+          "nulo": true,
+          "pk": false,
+          "unico": true,
+          "descripcion": "Código 3-alfa de la lista ASFIS de la FAO"
+        },
+        {
+          "columna": "nombre_comun",
+          "tipo": "character varying(80)",
+          "nulo": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Norma o resolución que sustenta el registro"
+          "descripcion": "Nombre común usado en el muelle"
+        },
+        {
+          "columna": "nombre_cientifico",
+          "tipo": "character varying(120)",
+          "nulo": false,
+          "pk": false,
+          "unico": true,
+          "descripcion": "Nombre científico"
+        }
+      ],
+      "restricciones": [
+        {
+          "nombre": "especie_codigo_fao_check",
+          "definicion": "CHECK ((codigo_fao ~ '^[A-Z]{3}$'::text))"
+        }
+      ]
+    },
+    {
+      "tabla": "talla_minima",
+      "descripcion": "Talla mínima y tolerancia de juveniles con vigencia; un cambio aplica solo a desembarques posteriores (RD03, HU05).",
+      "columnas": [
+        {
+          "columna": "id_talla",
+          "tipo": "integer",
+          "nulo": false,
+          "por_defecto": "nextval('sirdepa.talla_minima_id_talla_seq'::regclass)",
+          "pk": true,
+          "unico": false,
+          "descripcion": "Identificador de la regla de talla"
+        },
+        {
+          "columna": "id_especie",
+          "tipo": "integer",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "fk": {
+            "tabla": "especie",
+            "columna": "id_especie"
+          },
+          "descripcion": "Especie"
+        },
+        {
+          "columna": "talla_minima_cm",
+          "tipo": "numeric(6,2)",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Talla mínima de captura en cm"
+        },
+        {
+          "columna": "tolerancia_juveniles_pct",
+          "tipo": "numeric(5,2)",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Porcentaje máximo de ejemplares bajo la talla mínima"
+        },
+        {
+          "columna": "norma",
+          "tipo": "character varying(80)",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Resolución que fija la talla"
         },
         {
           "columna": "vigente_desde",
           "tipo": "date",
           "nulo": false,
-          "por_defecto": "CURRENT_DATE",
-          "generada": false,
           "pk": false,
           "unico": false,
           "descripcion": "Inicio de vigencia"
@@ -339,1035 +687,1288 @@
           "columna": "vigente_hasta",
           "tipo": "date",
           "nulo": true,
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Fin de vigencia (NULL = indefinida)"
-        },
-        {
-          "columna": "geom",
-          "tipo": "geometry(MultiPolygon,4326)",
-          "nulo": false,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Geometría PostGIS en WGS84 (SRID 4326)"
+          "descripcion": "Fin de vigencia (NULL = vigente)"
         }
       ],
       "restricciones": [
-        "CHECK (((vigente_hasta IS NULL) OR (vigente_hasta >= vigente_desde)))"
+        {
+          "nombre": "ck_talla_vigencia",
+          "definicion": "CHECK (((vigente_hasta IS NULL) OR (vigente_hasta >= vigente_desde)))"
+        },
+        {
+          "nombre": "talla_minima_talla_minima_cm_check",
+          "definicion": "CHECK ((talla_minima_cm > (0)::numeric))"
+        },
+        {
+          "nombre": "talla_minima_tolerancia_juveniles_pct_check",
+          "definicion": "CHECK (((tolerancia_juveniles_pct >= (0)::numeric) AND (tolerancia_juveniles_pct <= (100)::numeric)))"
+        },
+        {
+          "nombre": "uq_talla_desde",
+          "definicion": "UNIQUE (id_especie, vigente_desde)"
+        }
       ]
     },
     {
-      "tabla": "especie",
-      "descripcion": "Catálogo de especies hidrobiológicas con talla mínima y cuota anual.",
-      "requerimiento": "RD01",
+      "tabla": "arte_pesca",
+      "descripcion": "Artes y aparejos de pesca (RF04).",
       "columnas": [
         {
-          "columna": "id_esp",
+          "columna": "id_arte",
           "tipo": "integer",
           "nulo": false,
-          "por_defecto": "nextval('sirdepa.especie_id_esp_seq'::regclass)",
-          "generada": false,
+          "por_defecto": "nextval('sirdepa.arte_pesca_id_arte_seq'::regclass)",
           "pk": true,
           "unico": false,
-          "descripcion": "Identificador de la especie"
+          "descripcion": "Identificador del arte"
         },
         {
-          "columna": "nombre_cientifico",
-          "tipo": "character varying(120)",
-          "nulo": false,
-          "generada": false,
-          "pk": false,
-          "unico": true,
-          "descripcion": "Nombre científico de la especie"
-        },
-        {
-          "columna": "nombre_comun",
+          "columna": "nombre",
           "tipo": "character varying(80)",
           "nulo": false,
-          "generada": false,
           "pk": false,
-          "unico": false,
-          "descripcion": "Nombre común de la especie"
+          "unico": true,
+          "descripcion": "Nombre del arte de pesca"
         },
         {
-          "columna": "talla_minima_cm",
-          "tipo": "numeric(6,2)",
-          "nulo": true,
-          "generada": false,
+          "columna": "tipo",
+          "tipo": "character varying(40)",
+          "nulo": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Talla mínima de captura en cm"
+          "descripcion": "Familia del arte (CERCO, ENMALLE, ANZUELO)"
         },
         {
-          "columna": "cuota_anual_t",
-          "tipo": "numeric(12,2)",
-          "nulo": true,
-          "generada": false,
+          "columna": "mecanizado",
+          "tipo": "boolean",
+          "nulo": false,
+          "por_defecto": "false",
           "pk": false,
           "unico": false,
-          "descripcion": "Límite máximo de captura anual en toneladas"
+          "descripcion": "Arte con sistemas mecanizados"
+        }
+      ],
+      "restricciones": []
+    },
+    {
+      "tabla": "zona_pesca",
+      "descripcion": "Cuadrícula de pesca; se registra la cuadrícula y no la coordenada exacta del caladero (RNF09, RD08).",
+      "columnas": [
+        {
+          "columna": "id_zona",
+          "tipo": "integer",
+          "nulo": false,
+          "por_defecto": "nextval('sirdepa.zona_pesca_id_zona_seq'::regclass)",
+          "pk": true,
+          "unico": false,
+          "descripcion": "Identificador de la zona"
+        },
+        {
+          "columna": "codigo_cuadricula",
+          "tipo": "character varying(20)",
+          "nulo": false,
+          "pk": false,
+          "unico": true,
+          "descripcion": "Código de la cuadrícula de pesca"
+        },
+        {
+          "columna": "dentro_5_millas",
+          "tipo": "boolean",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Cuadrícula dentro de las 5 millas"
+        },
+        {
+          "columna": "dentro_3_millas",
+          "tipo": "boolean",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Cuadrícula dentro de las 3 millas"
+        },
+        {
+          "columna": "geom",
+          "tipo": "geometry(Polygon,4326)",
+          "nulo": true,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Polígono de la cuadrícula (SRID 4326)"
         }
       ],
       "restricciones": [
-        "CHECK ((talla_minima_cm > (0)::numeric))",
-        "CHECK ((cuota_anual_t >= (0)::numeric))"
+        {
+          "nombre": "ck_millas",
+          "definicion": "CHECK (((NOT dentro_3_millas) OR dentro_5_millas))"
+        }
       ]
     },
     {
       "tabla": "veda",
-      "descripcion": "Periodos de veda por especie y, opcionalmente, por zona.",
-      "requerimiento": "RD01",
+      "descripcion": "Veda por especie y, opcionalmente, por zona, con su norma (RD04).",
       "columnas": [
         {
           "columna": "id_veda",
           "tipo": "integer",
           "nulo": false,
           "por_defecto": "nextval('sirdepa.veda_id_veda_seq'::regclass)",
-          "generada": false,
           "pk": true,
           "unico": false,
           "descripcion": "Identificador de la veda"
         },
         {
-          "columna": "id_esp",
+          "columna": "id_especie",
           "tipo": "integer",
           "nulo": false,
-          "generada": false,
           "pk": false,
           "unico": false,
           "fk": {
             "tabla": "especie",
-            "columna": "id_esp"
+            "columna": "id_especie"
           },
-          "descripcion": "Identificador de la especie"
+          "descripcion": "Especie en veda"
         },
         {
           "columna": "id_zona",
           "tipo": "integer",
           "nulo": true,
-          "generada": false,
           "pk": false,
           "unico": false,
           "fk": {
-            "tabla": "zona",
+            "tabla": "zona_pesca",
             "columna": "id_zona"
           },
-          "descripcion": "Identificador de la zona"
+          "descripcion": "Zona de la veda (NULL = todo el litoral)"
         },
         {
           "columna": "fecha_inicio",
           "tipo": "date",
           "nulo": false,
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Fecha de inicio"
+          "descripcion": "Inicio de la veda"
         },
         {
           "columna": "fecha_fin",
           "tipo": "date",
           "nulo": false,
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Fecha de fin"
+          "descripcion": "Fin de la veda"
         },
         {
-          "columna": "norma_legal",
-          "tipo": "character varying(120)",
-          "nulo": true,
-          "generada": false,
+          "columna": "norma",
+          "tipo": "character varying(80)",
+          "nulo": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Norma o resolución que sustenta el registro"
+          "descripcion": "Resolución que dispone la veda"
         }
       ],
       "restricciones": [
-        "CHECK ((fecha_fin >= fecha_inicio))"
-      ]
-    },
-    {
-      "tabla": "permiso",
-      "descripcion": "Permisos de pesca otorgados a cada embarcación.",
-      "requerimiento": "RD01",
-      "columnas": [
         {
-          "columna": "id_perm",
-          "tipo": "integer",
-          "nulo": false,
-          "por_defecto": "nextval('sirdepa.permiso_id_perm_seq'::regclass)",
-          "generada": false,
-          "pk": true,
-          "unico": false,
-          "descripcion": "Identificador del permiso"
-        },
-        {
-          "columna": "id_emb",
-          "tipo": "integer",
-          "nulo": false,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "fk": {
-            "tabla": "embarcacion",
-            "columna": "id_emb"
-          },
-          "descripcion": "Identificador de la embarcación"
-        },
-        {
-          "columna": "gestionado_por",
-          "tipo": "integer",
-          "nulo": true,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "fk": {
-            "tabla": "usuario",
-            "columna": "id_usr"
-          },
-          "descripcion": "Usuario de PRODUCE que gestiona el permiso"
-        },
-        {
-          "columna": "tipo_permiso",
-          "tipo": "character varying(60)",
-          "nulo": false,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Tipo de permiso de pesca"
-        },
-        {
-          "columna": "numero_resolucion",
-          "tipo": "character varying(60)",
-          "nulo": false,
-          "generada": false,
-          "pk": false,
-          "unico": true,
-          "descripcion": "Número de resolución directoral que otorga el permiso"
-        },
-        {
-          "columna": "fecha_inicio",
-          "tipo": "date",
-          "nulo": false,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Fecha de inicio"
-        },
-        {
-          "columna": "fecha_fin",
-          "tipo": "date",
-          "nulo": false,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Fecha de fin"
-        },
-        {
-          "columna": "estado",
-          "tipo": "sirdepa.estado_permiso",
-          "nulo": false,
-          "por_defecto": "'VIGENTE'::sirdepa.estado_permiso",
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Estado actual del registro"
+          "nombre": "ck_veda_fechas",
+          "definicion": "CHECK ((fecha_fin >= fecha_inicio))"
         }
-      ],
-      "restricciones": [
-        "CHECK ((fecha_fin >= fecha_inicio))"
       ]
     },
     {
       "tabla": "permiso_especie",
-      "descripcion": "Especies autorizadas por cada permiso (relación N a N).",
-      "requerimiento": null,
+      "descripcion": "Especies autorizadas por cada permiso (N:M).",
       "columnas": [
         {
-          "columna": "id_perm",
+          "columna": "id_permiso",
           "tipo": "integer",
           "nulo": false,
-          "generada": false,
           "pk": true,
           "unico": false,
           "fk": {
-            "tabla": "permiso",
-            "columna": "id_perm"
+            "tabla": "permiso_pesca",
+            "columna": "id_permiso"
           },
-          "descripcion": "Identificador del permiso"
+          "descripcion": "Permiso"
         },
         {
-          "columna": "id_esp",
+          "columna": "id_especie",
           "tipo": "integer",
           "nulo": false,
-          "generada": false,
           "pk": true,
           "unico": false,
           "fk": {
             "tabla": "especie",
-            "columna": "id_esp"
+            "columna": "id_especie"
           },
-          "descripcion": "Identificador de la especie"
+          "descripcion": "Especie autorizada"
         }
       ],
-      "restricciones": []
-    },
-    {
-      "tabla": "localizacion",
-      "descripcion": "Puntos de desembarque o faena con coordenadas.",
-      "requerimiento": null,
-      "columnas": [
-        {
-          "columna": "id_loc",
-          "tipo": "integer",
-          "nulo": false,
-          "por_defecto": "nextval('sirdepa.localizacion_id_loc_seq'::regclass)",
-          "generada": false,
-          "pk": true,
-          "unico": false,
-          "descripcion": "Identificador de la localización"
-        },
-        {
-          "columna": "nombre",
-          "tipo": "character varying(120)",
-          "nulo": false,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Nombre descriptivo"
-        },
-        {
-          "columna": "latitud",
-          "tipo": "numeric(9,6)",
-          "nulo": false,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Latitud en grados decimales"
-        },
-        {
-          "columna": "longitud",
-          "tipo": "numeric(9,6)",
-          "nulo": false,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Longitud en grados decimales"
-        },
-        {
-          "columna": "geom",
-          "tipo": "geometry(Point,4326)",
-          "nulo": true,
-          "por_defecto": "st_setsrid(st_makepoint((longitud)::double precision, (latitud)::double precision), 4326)",
-          "generada": true,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Geometría PostGIS en WGS84 (SRID 4326)"
-        },
-        {
-          "columna": "id_zona",
-          "tipo": "integer",
-          "nulo": true,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "fk": {
-            "tabla": "zona",
-            "columna": "id_zona"
-          },
-          "descripcion": "Identificador de la zona"
-        }
-      ],
-      "restricciones": [
-        "CHECK (((latitud >= ('-90'::integer)::numeric) AND (latitud <= (90)::numeric)))",
-        "CHECK (((longitud >= ('-180'::integer)::numeric) AND (longitud <= (180)::numeric)))"
+      "restricciones": [],
+      "pk_compuesta": [
+        "PRIMARY KEY (id_permiso, id_especie)"
       ]
     },
     {
-      "tabla": "posicion_gps",
-      "descripcion": "Registro de posiciones GPS de cada embarcación (MonitoreoGPS).",
-      "requerimiento": "RF01.1",
+      "tabla": "permiso_arte",
+      "descripcion": "Artes autorizadas por cada permiso (N:M).",
       "columnas": [
         {
-          "columna": "id_pos",
-          "tipo": "bigint",
-          "nulo": false,
-          "por_defecto": "nextval('sirdepa.posicion_gps_id_pos_seq'::regclass)",
-          "generada": false,
-          "pk": true,
-          "unico": false,
-          "descripcion": "Identificador de la posición GPS"
-        },
-        {
-          "columna": "id_emb",
+          "columna": "id_permiso",
           "tipo": "integer",
           "nulo": false,
-          "generada": false,
+          "pk": true,
+          "unico": false,
+          "fk": {
+            "tabla": "permiso_pesca",
+            "columna": "id_permiso"
+          },
+          "descripcion": "Permiso"
+        },
+        {
+          "columna": "id_arte",
+          "tipo": "integer",
+          "nulo": false,
+          "pk": true,
+          "unico": false,
+          "fk": {
+            "tabla": "arte_pesca",
+            "columna": "id_arte"
+          },
+          "descripcion": "Arte autorizada"
+        }
+      ],
+      "restricciones": [],
+      "pk_compuesta": [
+        "PRIMARY KEY (id_permiso, id_arte)"
+      ]
+    },
+    {
+      "tabla": "aviso_arribo",
+      "descripcion": "Aviso previo del patrón con hora estimada y captura aproximada (RF05).",
+      "columnas": [
+        {
+          "columna": "id_aviso",
+          "tipo": "integer",
+          "nulo": false,
+          "por_defecto": "nextval('sirdepa.aviso_arribo_id_aviso_seq'::regclass)",
+          "pk": true,
+          "unico": false,
+          "descripcion": "Identificador del aviso"
+        },
+        {
+          "columna": "id_embarcacion",
+          "tipo": "integer",
+          "nulo": false,
           "pk": false,
           "unico": false,
           "fk": {
             "tabla": "embarcacion",
-            "columna": "id_emb"
+            "columna": "id_embarcacion"
           },
-          "descripcion": "Identificador de la embarcación"
+          "descripcion": "Embarcación que llega"
         },
         {
-          "columna": "fecha_hora",
-          "tipo": "timestamp with time zone",
-          "nulo": false,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Fecha y hora del evento"
-        },
-        {
-          "columna": "latitud",
-          "tipo": "numeric(9,6)",
-          "nulo": false,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Latitud en grados decimales"
-        },
-        {
-          "columna": "longitud",
-          "tipo": "numeric(9,6)",
-          "nulo": false,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Longitud en grados decimales"
-        },
-        {
-          "columna": "geom",
-          "tipo": "geometry(Point,4326)",
-          "nulo": true,
-          "por_defecto": "st_setsrid(st_makepoint((longitud)::double precision, (latitud)::double precision), 4326)",
-          "generada": true,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Geometría PostGIS en WGS84 (SRID 4326)"
-        },
-        {
-          "columna": "velocidad_nudos",
-          "tipo": "numeric(5,2)",
-          "nulo": true,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Velocidad de la embarcación en nudos"
-        },
-        {
-          "columna": "rumbo_grados",
-          "tipo": "numeric(5,2)",
-          "nulo": true,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Rumbo en grados (0-359)"
-        },
-        {
-          "columna": "en_zona_permitida",
-          "tipo": "boolean",
-          "nulo": false,
-          "por_defecto": "true",
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "FALSE si la posición cae en una zona restringida (lo calcula un trigger)"
-        },
-        {
-          "columna": "recibido_en",
-          "tipo": "timestamp with time zone",
-          "nulo": false,
-          "por_defecto": "now()",
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Momento en que la plataforma recibió el dato (sync inmediata o batch)"
-        }
-      ],
-      "restricciones": [
-        "CHECK (((latitud >= ('-90'::integer)::numeric) AND (latitud <= (90)::numeric)))",
-        "CHECK (((longitud >= ('-180'::integer)::numeric) AND (longitud <= (180)::numeric)))",
-        "CHECK ((velocidad_nudos >= (0)::numeric))",
-        "CHECK (((rumbo_grados >= (0)::numeric) AND (rumbo_grados < (360)::numeric)))"
-      ]
-    },
-    {
-      "tabla": "sensor_registro",
-      "descripcion": "Lecturas de sensores oceanográficos y meteorológicos.",
-      "requerimiento": "RF01.6",
-      "columnas": [
-        {
-          "columna": "id_reg",
-          "tipo": "bigint",
-          "nulo": false,
-          "por_defecto": "nextval('sirdepa.sensor_registro_id_reg_seq'::regclass)",
-          "generada": false,
-          "pk": true,
-          "unico": false,
-          "descripcion": "Identificador de la lectura de sensor"
-        },
-        {
-          "columna": "id_emb",
+          "columna": "id_lugar",
           "tipo": "integer",
           "nulo": false,
-          "generada": false,
           "pk": false,
           "unico": false,
           "fk": {
-            "tabla": "embarcacion",
-            "columna": "id_emb"
+            "tabla": "lugar_desembarque",
+            "columna": "id_lugar"
           },
-          "descripcion": "Identificador de la embarcación"
+          "descripcion": "DPA de llegada"
         },
         {
-          "columna": "ts",
+          "columna": "hora_estimada",
           "tipo": "timestamp with time zone",
           "nulo": false,
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Fecha y hora de la lectura"
+          "descripcion": "Hora estimada de llegada"
         },
         {
-          "columna": "latitud",
-          "tipo": "numeric(9,6)",
-          "nulo": true,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Latitud en grados decimales"
-        },
-        {
-          "columna": "longitud",
-          "tipo": "numeric(9,6)",
-          "nulo": true,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Longitud en grados decimales"
-        },
-        {
-          "columna": "tipo_sensor",
-          "tipo": "character varying(40)",
-          "nulo": false,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Tipo de sensor que generó la lectura"
-        },
-        {
-          "columna": "valor",
-          "tipo": "numeric(10,3)",
-          "nulo": false,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Valor medido"
-        },
-        {
-          "columna": "unidad",
-          "tipo": "character varying(15)",
-          "nulo": false,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Unidad de medida del valor"
-        }
-      ],
-      "restricciones": [
-        "CHECK (((tipo_sensor)::text = ANY ((ARRAY['TEMPERATURA_AGUA'::character varying, 'SALINIDAD'::character varying, 'OXIGENO'::character varying, 'VIENTO'::character varying, 'OLEAJE'::character varying, 'PRESION'::character varying])::text[])))"
-      ]
-    },
-    {
-      "tabla": "lote",
-      "descripcion": "Lote de trazabilidad identificado por un código QR único.",
-      "requerimiento": "RF01.5",
-      "columnas": [
-        {
-          "columna": "id_lote",
-          "tipo": "integer",
-          "nulo": false,
-          "por_defecto": "nextval('sirdepa.lote_id_lote_seq'::regclass)",
-          "generada": false,
-          "pk": true,
-          "unico": false,
-          "descripcion": "Identificador del lote"
-        },
-        {
-          "columna": "codigo_qr",
-          "tipo": "uuid",
-          "nulo": false,
-          "por_defecto": "gen_random_uuid()",
-          "generada": false,
-          "pk": false,
-          "unico": true,
-          "descripcion": "UUID codificado en el QR del lote"
-        },
-        {
-          "columna": "fecha_creacion",
-          "tipo": "timestamp with time zone",
-          "nulo": false,
-          "por_defecto": "now()",
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Fecha de creación del lote"
-        },
-        {
-          "columna": "estado_trazabilidad",
-          "tipo": "sirdepa.estado_lote",
-          "nulo": false,
-          "por_defecto": "'GENERADO'::sirdepa.estado_lote",
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Estado del lote en la cadena de comercialización"
-        },
-        {
-          "columna": "destino",
-          "tipo": "character varying(150)",
-          "nulo": true,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Destino comercial del lote"
-        }
-      ],
-      "restricciones": []
-    },
-    {
-      "tabla": "captura",
-      "descripcion": "Bitácora digital: cabecera de cada captura o desembarque.",
-      "requerimiento": "RF01.3",
-      "columnas": [
-        {
-          "columna": "id_capt",
-          "tipo": "integer",
-          "nulo": false,
-          "por_defecto": "nextval('sirdepa.captura_id_capt_seq'::regclass)",
-          "generada": false,
-          "pk": true,
-          "unico": false,
-          "descripcion": "Identificador de la captura"
-        },
-        {
-          "columna": "id_emb",
-          "tipo": "integer",
-          "nulo": false,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "fk": {
-            "tabla": "embarcacion",
-            "columna": "id_emb"
-          },
-          "descripcion": "Identificador de la embarcación"
-        },
-        {
-          "columna": "id_lote",
-          "tipo": "integer",
-          "nulo": true,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "fk": {
-            "tabla": "lote",
-            "columna": "id_lote"
-          },
-          "descripcion": "Identificador del lote"
-        },
-        {
-          "columna": "id_loc",
-          "tipo": "integer",
-          "nulo": true,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "fk": {
-            "tabla": "localizacion",
-            "columna": "id_loc"
-          },
-          "descripcion": "Identificador de la localización"
-        },
-        {
-          "columna": "registrado_por",
-          "tipo": "integer",
-          "nulo": true,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "fk": {
-            "tabla": "usuario",
-            "columna": "id_usr"
-          },
-          "descripcion": "Usuario que registró la captura"
-        },
-        {
-          "columna": "fecha_hora",
-          "tipo": "timestamp with time zone",
-          "nulo": false,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Fecha y hora del evento"
-        },
-        {
-          "columna": "total_kg",
-          "tipo": "numeric(12,2)",
-          "nulo": false,
-          "por_defecto": "0",
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Peso total de la captura (suma del detalle, por trigger)"
-        },
-        {
-          "columna": "temperatura_agua_c",
-          "tipo": "numeric(4,1)",
-          "nulo": true,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Temperatura del agua en °C"
-        },
-        {
-          "columna": "arte_pesca",
-          "tipo": "character varying(60)",
-          "nulo": true,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Arte o aparejo de pesca utilizado"
-        },
-        {
-          "columna": "estado_validacion",
-          "tipo": "sirdepa.estado_validacion",
-          "nulo": false,
-          "por_defecto": "'PENDIENTE'::sirdepa.estado_validacion",
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "descripcion": "Resultado de la validación automática"
-        },
-        {
-          "columna": "observaciones",
+          "columna": "captura_aproximada",
           "tipo": "text",
           "nulo": true,
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Observaciones libres"
+          "descripcion": "Descripción libre de lo que trae"
+        },
+        {
+          "columna": "estado",
+          "tipo": "sirdepa.estado_aviso",
+          "nulo": false,
+          "por_defecto": "'PENDIENTE'::sirdepa.estado_aviso",
+          "pk": false,
+          "unico": false,
+          "descripcion": "PENDIENTE, ATENDIDO o CANCELADO"
         },
         {
           "columna": "creado_en",
           "tipo": "timestamp with time zone",
           "nulo": false,
           "por_defecto": "now()",
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Fecha y hora de creación del registro"
+          "descripcion": "Fecha de envío del aviso"
         }
       ],
-      "restricciones": [
-        "CHECK ((total_kg >= (0)::numeric))"
-      ]
+      "restricciones": []
     },
     {
-      "tabla": "detalle_captura",
-      "descripcion": "Detalle por especie de cada captura (kg, unidades, talla).",
-      "requerimiento": "RF01.3",
+      "tabla": "desembarque",
+      "descripcion": "Entidad central: llegada de una faena de una embarcación a un lugar de desembarque (RF06).",
       "columnas": [
         {
-          "columna": "id_det",
-          "tipo": "integer",
+          "columna": "id_desembarque",
+          "tipo": "uuid",
           "nulo": false,
-          "por_defecto": "nextval('sirdepa.detalle_captura_id_det_seq'::regclass)",
-          "generada": false,
           "pk": true,
           "unico": false,
-          "descripcion": "Identificador del detalle de captura"
+          "descripcion": "UUID generado en el celular; también es la Idempotency-Key"
         },
         {
-          "columna": "id_capt",
+          "columna": "id_embarcacion",
           "tipo": "integer",
           "nulo": false,
-          "generada": false,
           "pk": false,
           "unico": false,
           "fk": {
-            "tabla": "captura",
-            "columna": "id_capt"
+            "tabla": "embarcacion",
+            "columna": "id_embarcacion"
           },
-          "descripcion": "Identificador de la captura"
+          "descripcion": "Embarcación"
         },
         {
-          "columna": "id_esp",
+          "columna": "id_lugar",
           "tipo": "integer",
           "nulo": false,
-          "generada": false,
+          "pk": false,
+          "unico": false,
+          "fk": {
+            "tabla": "lugar_desembarque",
+            "columna": "id_lugar"
+          },
+          "descripcion": "Lugar de desembarque"
+        },
+        {
+          "columna": "id_registrador",
+          "tipo": "uuid",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "fk": {
+            "tabla": "usuario",
+            "columna": "id_usuario"
+          },
+          "descripcion": "Usuario que registró"
+        },
+        {
+          "columna": "id_aviso",
+          "tipo": "integer",
+          "nulo": true,
+          "pk": false,
+          "unico": true,
+          "fk": {
+            "tabla": "aviso_arribo",
+            "columna": "id_aviso"
+          },
+          "descripcion": "Aviso de arribo que lo originó"
+        },
+        {
+          "columna": "codigo_faena",
+          "tipo": "character varying(30)",
+          "nulo": true,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Código de faena (RD05)"
+        },
+        {
+          "columna": "fecha_zarpe",
+          "tipo": "timestamp with time zone",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Fecha y hora de zarpe"
+        },
+        {
+          "columna": "fecha_hora_arribo",
+          "tipo": "timestamp with time zone",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Fecha y hora de arribo"
+        },
+        {
+          "columna": "id_zona",
+          "tipo": "integer",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "fk": {
+            "tabla": "zona_pesca",
+            "columna": "id_zona"
+          },
+          "descripcion": "Cuadrícula de pesca"
+        },
+        {
+          "columna": "id_arte",
+          "tipo": "integer",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "fk": {
+            "tabla": "arte_pesca",
+            "columna": "id_arte"
+          },
+          "descripcion": "Arte de pesca empleado"
+        },
+        {
+          "columna": "tripulantes",
+          "tipo": "smallint",
+          "nulo": true,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Número de tripulantes"
+        },
+        {
+          "columna": "estado_validacion",
+          "tipo": "sirdepa.estado_validacion",
+          "nulo": true,
+          "pk": false,
+          "unico": false,
+          "descripcion": "CONFORME, OBSERVADO o NO_CONFORME"
+        },
+        {
+          "columna": "estado_registro",
+          "tipo": "sirdepa.estado_registro",
+          "nulo": false,
+          "por_defecto": "'BORRADOR'::sirdepa.estado_registro",
+          "pk": false,
+          "unico": false,
+          "descripcion": "BORRADOR, EMITIDO o ANULADO"
+        },
+        {
+          "columna": "origen",
+          "tipo": "sirdepa.origen_registro",
+          "nulo": false,
+          "por_defecto": "'APP_MOVIL'::sirdepa.origen_registro",
+          "pk": false,
+          "unico": false,
+          "descripcion": "APP_MOVIL o PORTAL_WEB"
+        },
+        {
+          "columna": "registrado_en",
+          "tipo": "timestamp with time zone",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Hora de registro en el celular"
+        },
+        {
+          "columna": "sincronizado_en",
+          "tipo": "timestamp with time zone",
+          "nulo": false,
+          "por_defecto": "now()",
+          "pk": false,
+          "unico": false,
+          "descripcion": "Hora de llegada al servidor"
+        },
+        {
+          "columna": "motivo_anulacion",
+          "tipo": "text",
+          "nulo": true,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Motivo obligatorio de la anulación"
+        },
+        {
+          "columna": "anulado_por",
+          "tipo": "uuid",
+          "nulo": true,
+          "pk": false,
+          "unico": false,
+          "fk": {
+            "tabla": "usuario",
+            "columna": "id_usuario"
+          },
+          "descripcion": "Usuario que anuló"
+        },
+        {
+          "columna": "anulado_en",
+          "tipo": "timestamp with time zone",
+          "nulo": true,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Fecha de anulación"
+        }
+      ],
+      "restricciones": [
+        {
+          "nombre": "ck_anulacion",
+          "definicion": "CHECK (((estado_registro = 'ANULADO'::sirdepa.estado_registro) = ((motivo_anulacion IS NOT NULL) AND (anulado_por IS NOT NULL) AND (anulado_en IS NOT NULL))))"
+        },
+        {
+          "nombre": "ck_fechas_faena",
+          "definicion": "CHECK ((fecha_hora_arribo >= fecha_zarpe))"
+        },
+        {
+          "nombre": "desembarque_tripulantes_check",
+          "definicion": "CHECK ((tripulantes > 0))"
+        }
+      ]
+    },
+    {
+      "tabla": "detalle_desembarque",
+      "descripcion": "Kilos por especie y presentación de un desembarque (RF07).",
+      "columnas": [
+        {
+          "columna": "id_detalle",
+          "tipo": "integer",
+          "nulo": false,
+          "por_defecto": "nextval('sirdepa.detalle_desembarque_id_detalle_seq'::regclass)",
+          "pk": true,
+          "unico": false,
+          "descripcion": "Identificador del detalle"
+        },
+        {
+          "columna": "id_desembarque",
+          "tipo": "uuid",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "fk": {
+            "tabla": "desembarque",
+            "columna": "id_desembarque"
+          },
+          "descripcion": "Desembarque"
+        },
+        {
+          "columna": "id_especie",
+          "tipo": "integer",
+          "nulo": false,
           "pk": false,
           "unico": false,
           "fk": {
             "tabla": "especie",
-            "columna": "id_esp"
+            "columna": "id_especie"
           },
-          "descripcion": "Identificador de la especie"
+          "descripcion": "Especie"
         },
         {
-          "columna": "cantidad_kg",
-          "tipo": "numeric(12,2)",
+          "columna": "peso_kg",
+          "tipo": "numeric(10,2)",
           "nulo": false,
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Peso capturado de la especie en kg"
+          "descripcion": "Peso en kg (mayor que cero)"
         },
         {
-          "columna": "cantidad_unidades",
+          "columna": "unidades",
           "tipo": "integer",
           "nulo": true,
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Número de ejemplares"
+          "descripcion": "Número de ejemplares (opcional)"
         },
         {
-          "columna": "talla_promedio_cm",
-          "tipo": "numeric(6,2)",
-          "nulo": true,
-          "generada": false,
+          "columna": "presentacion",
+          "tipo": "character varying(30)",
+          "nulo": false,
+          "por_defecto": "'ENTERO'::character varying",
           "pk": false,
           "unico": false,
-          "descripcion": "Talla promedio medida en cm"
+          "descripcion": "Presentación (entero, eviscerado, ...)"
         },
         {
-          "columna": "cumple_talla_minima",
-          "tipo": "boolean",
+          "columna": "precio_playa_kg",
+          "tipo": "numeric(8,2)",
           "nulo": true,
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "TRUE si la talla promedio alcanza la mínima (lo calcula un trigger)"
+          "descripcion": "Precio en playa por kg (S/)"
         }
       ],
       "restricciones": [
-        "CHECK ((cantidad_kg > (0)::numeric))",
-        "CHECK ((cantidad_unidades >= 0))",
-        "CHECK ((talla_promedio_cm > (0)::numeric))"
+        {
+          "nombre": "detalle_desembarque_peso_kg_check",
+          "definicion": "CHECK ((peso_kg > (0)::numeric))"
+        },
+        {
+          "nombre": "detalle_desembarque_precio_playa_kg_check",
+          "definicion": "CHECK ((precio_playa_kg >= (0)::numeric))"
+        },
+        {
+          "nombre": "detalle_desembarque_unidades_check",
+          "definicion": "CHECK ((unidades > 0))"
+        },
+        {
+          "nombre": "uq_detalle",
+          "definicion": "UNIQUE (id_desembarque, id_especie, presentacion)"
+        }
+      ]
+    },
+    {
+      "tabla": "muestreo_talla",
+      "descripcion": "Tallas de una muestra de ejemplares de un detalle (RF09).",
+      "columnas": [
+        {
+          "columna": "id_muestreo",
+          "tipo": "integer",
+          "nulo": false,
+          "por_defecto": "nextval('sirdepa.muestreo_talla_id_muestreo_seq'::regclass)",
+          "pk": true,
+          "unico": false,
+          "descripcion": "Identificador del muestreo"
+        },
+        {
+          "columna": "id_detalle",
+          "tipo": "integer",
+          "nulo": false,
+          "pk": false,
+          "unico": true,
+          "fk": {
+            "tabla": "detalle_desembarque",
+            "columna": "id_detalle"
+          },
+          "descripcion": "Detalle muestreado"
+        },
+        {
+          "columna": "tallas_cm",
+          "tipo": "numeric(6,2)[]",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Tallas medidas en cm"
+        },
+        {
+          "columna": "pct_bajo_talla",
+          "tipo": "numeric(5,2)",
+          "nulo": true,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Porcentaje bajo la talla mínima vigente (lo calcula la validación)"
+        },
+        {
+          "columna": "registrado_en",
+          "tipo": "timestamp with time zone",
+          "nulo": false,
+          "por_defecto": "now()",
+          "pk": false,
+          "unico": false,
+          "descripcion": "Fecha del muestreo"
+        }
+      ],
+      "restricciones": [
+        {
+          "nombre": "muestreo_talla_tallas_cm_check",
+          "definicion": "CHECK ((cardinality(tallas_cm) > 0))"
+        }
       ]
     },
     {
       "tabla": "evidencia_foto",
-      "descripcion": "Fotografías de la captura usadas como evidencia.",
-      "requerimiento": "RF01.4",
+      "descripcion": "Hasta tres fotografías comprimidas por desembarque (RF11).",
       "columnas": [
         {
           "columna": "id_foto",
           "tipo": "integer",
           "nulo": false,
           "por_defecto": "nextval('sirdepa.evidencia_foto_id_foto_seq'::regclass)",
-          "generada": false,
           "pk": true,
           "unico": false,
           "descripcion": "Identificador de la foto"
         },
         {
-          "columna": "id_capt",
-          "tipo": "integer",
+          "columna": "id_desembarque",
+          "tipo": "uuid",
           "nulo": false,
-          "generada": false,
           "pk": false,
           "unico": false,
           "fk": {
-            "tabla": "captura",
-            "columna": "id_capt"
+            "tabla": "desembarque",
+            "columna": "id_desembarque"
           },
-          "descripcion": "Identificador de la captura"
+          "descripcion": "Desembarque"
         },
         {
           "columna": "url",
           "tipo": "text",
           "nulo": false,
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Ubicación del archivo de imagen"
+          "descripcion": "Ubicación del archivo"
         },
         {
           "columna": "hash_sha256",
           "tipo": "character(64)",
           "nulo": false,
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Hash SHA-256 de la imagen para garantizar integridad"
+          "descripcion": "Hash SHA-256 de la imagen"
+        },
+        {
+          "columna": "tamano_kb",
+          "tipo": "integer",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Tamaño en KB (máximo 300)"
         },
         {
           "columna": "tomada_en",
           "tipo": "timestamp with time zone",
           "nulo": false,
           "por_defecto": "now()",
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Fecha y hora de la foto"
+          "descripcion": "Fecha de la foto"
+        }
+      ],
+      "restricciones": [
+        {
+          "nombre": "evidencia_foto_hash_sha256_check",
+          "definicion": "CHECK ((hash_sha256 ~ '^[0-9a-f]{64}$'::text))"
+        },
+        {
+          "nombre": "evidencia_foto_tamano_kb_check",
+          "definicion": "CHECK (((tamano_kb >= 1) AND (tamano_kb <= 300)))"
+        }
+      ]
+    },
+    {
+      "tabla": "resultado_validacion",
+      "descripcion": "Resultado de cada regla del motor normativo, no solo el estado final (RF10).",
+      "columnas": [
+        {
+          "columna": "id_resultado",
+          "tipo": "integer",
+          "nulo": false,
+          "por_defecto": "nextval('sirdepa.resultado_validacion_id_resultado_seq'::regclass)",
+          "pk": true,
+          "unico": false,
+          "descripcion": "Identificador del resultado"
+        },
+        {
+          "columna": "id_desembarque",
+          "tipo": "uuid",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "fk": {
+            "tabla": "desembarque",
+            "columna": "id_desembarque"
+          },
+          "descripcion": "Desembarque evaluado"
+        },
+        {
+          "columna": "regla",
+          "tipo": "character varying(30)",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Regla evaluada (PERMISO_VIGENTE, VEDA, TALLA_MINIMA, ...)"
+        },
+        {
+          "columna": "nivel",
+          "tipo": "sirdepa.estado_validacion",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Nivel del resultado"
+        },
+        {
+          "columna": "mensaje",
+          "tipo": "text",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Explicación en lenguaje sencillo"
+        },
+        {
+          "columna": "norma",
+          "tipo": "character varying(80)",
+          "nulo": true,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Norma que sustenta la regla"
+        },
+        {
+          "columna": "evaluado_en",
+          "tipo": "timestamp with time zone",
+          "nulo": false,
+          "por_defecto": "now()",
+          "pk": false,
+          "unico": false,
+          "descripcion": "Fecha de evaluación"
         }
       ],
       "restricciones": []
     },
     {
-      "tabla": "alerta",
-      "descripcion": "Alertas generadas automáticamente por irregularidades detectadas.",
-      "requerimiento": "RF01.2 / RF01.7",
+      "tabla": "constancia",
+      "descripcion": "Constancia digital con código único, QR y hash SHA-256 (RF13).",
       "columnas": [
         {
-          "columna": "id_alerta",
+          "columna": "id_constancia",
           "tipo": "integer",
           "nulo": false,
-          "por_defecto": "nextval('sirdepa.alerta_id_alerta_seq'::regclass)",
-          "generada": false,
+          "por_defecto": "nextval('sirdepa.constancia_id_constancia_seq'::regclass)",
           "pk": true,
           "unico": false,
-          "descripcion": "Identificador de la alerta"
+          "descripcion": "Identificador de la constancia"
         },
         {
-          "columna": "id_emb",
-          "tipo": "integer",
+          "columna": "id_desembarque",
+          "tipo": "uuid",
           "nulo": false,
-          "generada": false,
           "pk": false,
-          "unico": false,
+          "unico": true,
           "fk": {
-            "tabla": "embarcacion",
-            "columna": "id_emb"
+            "tabla": "desembarque",
+            "columna": "id_desembarque"
           },
-          "descripcion": "Identificador de la embarcación"
+          "descripcion": "Desembarque certificado (0..1 constancia por desembarque)"
         },
         {
-          "columna": "id_pos",
-          "tipo": "bigint",
-          "nulo": true,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "fk": {
-            "tabla": "posicion_gps",
-            "columna": "id_pos"
-          },
-          "descripcion": "Identificador de la posición GPS"
-        },
-        {
-          "columna": "id_capt",
-          "tipo": "integer",
-          "nulo": true,
-          "generada": false,
-          "pk": false,
-          "unico": false,
-          "fk": {
-            "tabla": "captura",
-            "columna": "id_capt"
-          },
-          "descripcion": "Identificador de la captura"
-        },
-        {
-          "columna": "tipo_alerta",
-          "tipo": "sirdepa.tipo_alerta",
+          "columna": "codigo",
+          "tipo": "character varying(20)",
           "nulo": false,
-          "generada": false,
           "pk": false,
-          "unico": false,
-          "descripcion": "Tipo de irregularidad detectada"
+          "unico": true,
+          "descripcion": "Código único impreso en la constancia"
         },
         {
-          "columna": "descripcion",
+          "columna": "hash_sha256",
+          "tipo": "character(64)",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Huella SHA-256 del contenido canónico"
+        },
+        {
+          "columna": "url_qr",
           "tipo": "text",
           "nulo": false,
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Descripción legible de la alerta"
+          "descripcion": "Enlace de verificación codificado en el QR"
         },
         {
-          "columna": "nivel_gravedad",
-          "tipo": "sirdepa.nivel_gravedad",
+          "columna": "fecha_emision",
+          "tipo": "timestamp with time zone",
           "nulo": false,
-          "por_defecto": "'MEDIA'::sirdepa.nivel_gravedad",
-          "generada": false,
+          "por_defecto": "now()",
           "pk": false,
           "unico": false,
-          "descripcion": "Gravedad de la alerta"
+          "descripcion": "Fecha de emisión"
         },
         {
-          "columna": "estado_atencion",
-          "tipo": "sirdepa.estado_atencion",
-          "nulo": false,
-          "por_defecto": "'PENDIENTE'::sirdepa.estado_atencion",
-          "generada": false,
+          "columna": "sms_enviado_en",
+          "tipo": "timestamp with time zone",
+          "nulo": true,
           "pk": false,
           "unico": false,
-          "descripcion": "Estado de la atención por parte de la autoridad"
+          "descripcion": "Fecha de envío del SMS al armador"
+        }
+      ],
+      "restricciones": []
+    },
+    {
+      "tabla": "lote_destino",
+      "descripcion": "Kilos de un detalle entregados a un comprador; base de la trazabilidad (RF14, RF15, RD05).",
+      "columnas": [
+        {
+          "columna": "id_lote",
+          "tipo": "integer",
+          "nulo": false,
+          "por_defecto": "nextval('sirdepa.lote_destino_id_lote_seq'::regclass)",
+          "pk": true,
+          "unico": false,
+          "descripcion": "Identificador del lote"
+        },
+        {
+          "columna": "id_detalle",
+          "tipo": "integer",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "fk": {
+            "tabla": "detalle_desembarque",
+            "columna": "id_detalle"
+          },
+          "descripcion": "Detalle del que sale el lote"
+        },
+        {
+          "columna": "id_comprador",
+          "tipo": "integer",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "fk": {
+            "tabla": "comprador",
+            "columna": "id_comprador"
+          },
+          "descripcion": "Comprador"
+        },
+        {
+          "columna": "peso_kg",
+          "tipo": "numeric(10,2)",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Kilos asignados"
+        },
+        {
+          "columna": "placa_vehiculo",
+          "tipo": "character varying(10)",
+          "nulo": true,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Placa del vehículo"
+        },
+        {
+          "columna": "dni_conductor",
+          "tipo": "character(8)",
+          "nulo": true,
+          "pk": false,
+          "unico": false,
+          "descripcion": "DNI del conductor"
+        },
+        {
+          "columna": "destino",
+          "tipo": "character varying(120)",
+          "nulo": true,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Destino declarado"
+        },
+        {
+          "columna": "estado",
+          "tipo": "sirdepa.estado_lote",
+          "nulo": false,
+          "por_defecto": "'DESPACHADO'::sirdepa.estado_lote",
+          "pk": false,
+          "unico": false,
+          "descripcion": "DESPACHADO o RECIBIDO"
+        },
+        {
+          "columna": "despachado_en",
+          "tipo": "timestamp with time zone",
+          "nulo": false,
+          "por_defecto": "now()",
+          "pk": false,
+          "unico": false,
+          "descripcion": "Fecha de despacho"
+        },
+        {
+          "columna": "recibido_en",
+          "tipo": "timestamp with time zone",
+          "nulo": true,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Fecha de recepción confirmada"
+        },
+        {
+          "columna": "recibido_por",
+          "tipo": "uuid",
+          "nulo": true,
+          "pk": false,
+          "unico": false,
+          "fk": {
+            "tabla": "usuario",
+            "columna": "id_usuario"
+          },
+          "descripcion": "Usuario que confirmó la recepción"
+        }
+      ],
+      "restricciones": [
+        {
+          "nombre": "ck_recepcion",
+          "definicion": "CHECK (((estado = 'RECIBIDO'::sirdepa.estado_lote) = (recibido_en IS NOT NULL)))"
+        },
+        {
+          "nombre": "lote_destino_dni_conductor_check",
+          "definicion": "CHECK ((dni_conductor ~ '^[0-9]{8}$'::text))"
+        },
+        {
+          "nombre": "lote_destino_peso_kg_check",
+          "definicion": "CHECK ((peso_kg > (0)::numeric))"
+        }
+      ]
+    },
+    {
+      "tabla": "inspeccion",
+      "descripcion": "Observación o acta del fiscalizador vinculada al desembarque (RF17).",
+      "columnas": [
+        {
+          "columna": "id_inspeccion",
+          "tipo": "integer",
+          "nulo": false,
+          "por_defecto": "nextval('sirdepa.inspeccion_id_inspeccion_seq'::regclass)",
+          "pk": true,
+          "unico": false,
+          "descripcion": "Identificador de la inspección"
+        },
+        {
+          "columna": "id_desembarque",
+          "tipo": "uuid",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "fk": {
+            "tabla": "desembarque",
+            "columna": "id_desembarque"
+          },
+          "descripcion": "Desembarque inspeccionado"
+        },
+        {
+          "columna": "id_fiscalizador",
+          "tipo": "uuid",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "fk": {
+            "tabla": "usuario",
+            "columna": "id_usuario"
+          },
+          "descripcion": "Fiscalizador"
         },
         {
           "columna": "fecha_hora",
           "tipo": "timestamp with time zone",
           "nulo": false,
           "por_defecto": "now()",
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Fecha y hora del evento"
+          "descripcion": "Fecha y hora"
+        },
+        {
+          "columna": "resultado",
+          "tipo": "character varying(20)",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "SIN_OBSERVACION, OBSERVACION o ACTA"
+        },
+        {
+          "columna": "numero_acta",
+          "tipo": "character varying(30)",
+          "nulo": true,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Número de acta (obligatorio si hay acta)"
+        },
+        {
+          "columna": "observacion",
+          "tipo": "text",
+          "nulo": true,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Detalle de la observación"
+        }
+      ],
+      "restricciones": [
+        {
+          "nombre": "ck_acta",
+          "definicion": "CHECK ((((resultado)::text <> 'ACTA'::text) OR (numero_acta IS NOT NULL)))"
+        },
+        {
+          "nombre": "inspeccion_resultado_check",
+          "definicion": "CHECK (((resultado)::text = ANY ((ARRAY['SIN_OBSERVACION'::character varying, 'OBSERVACION'::character varying, 'ACTA'::character varying])::text[])))"
+        }
+      ]
+    },
+    {
+      "tabla": "alerta",
+      "descripcion": "Alertas al fiscalizador y avisos de vencimiento de permisos (RF22).",
+      "columnas": [
+        {
+          "columna": "id_alerta",
+          "tipo": "integer",
+          "nulo": false,
+          "por_defecto": "nextval('sirdepa.alerta_id_alerta_seq'::regclass)",
+          "pk": true,
+          "unico": false,
+          "descripcion": "Identificador de la alerta"
+        },
+        {
+          "columna": "tipo",
+          "tipo": "character varying(30)",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "NO_CONFORME o PERMISO_POR_VENCER"
+        },
+        {
+          "columna": "id_desembarque",
+          "tipo": "uuid",
+          "nulo": true,
+          "pk": false,
+          "unico": false,
+          "fk": {
+            "tabla": "desembarque",
+            "columna": "id_desembarque"
+          },
+          "descripcion": "Desembarque relacionado"
+        },
+        {
+          "columna": "id_permiso",
+          "tipo": "integer",
+          "nulo": true,
+          "pk": false,
+          "unico": false,
+          "fk": {
+            "tabla": "permiso_pesca",
+            "columna": "id_permiso"
+          },
+          "descripcion": "Permiso relacionado"
+        },
+        {
+          "columna": "mensaje",
+          "tipo": "text",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Texto de la alerta"
+        },
+        {
+          "columna": "creada_en",
+          "tipo": "timestamp with time zone",
+          "nulo": false,
+          "por_defecto": "now()",
+          "pk": false,
+          "unico": false,
+          "descripcion": "Fecha de creación"
         },
         {
           "columna": "atendida_por",
-          "tipo": "integer",
+          "tipo": "uuid",
           "nulo": true,
-          "generada": false,
           "pk": false,
           "unico": false,
           "fk": {
             "tabla": "usuario",
-            "columna": "id_usr"
+            "columna": "id_usuario"
           },
-          "descripcion": "Usuario que atendió la alerta"
+          "descripcion": "Usuario que la atendió"
         },
         {
           "columna": "atendida_en",
           "tipo": "timestamp with time zone",
           "nulo": true,
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Fecha y hora de atención"
+          "descripcion": "Fecha de atención"
         }
       ],
-      "restricciones": []
+      "restricciones": [
+        {
+          "nombre": "alerta_tipo_check",
+          "definicion": "CHECK (((tipo)::text = ANY ((ARRAY['NO_CONFORME'::character varying, 'PERMISO_POR_VENCER'::character varying])::text[])))"
+        },
+        {
+          "nombre": "ck_alerta_origen",
+          "definicion": "CHECK (((id_desembarque IS NOT NULL) OR (id_permiso IS NOT NULL)))"
+        }
+      ]
+    },
+    {
+      "tabla": "cierre_diario",
+      "descripcion": "Cierre del día por lugar de desembarque; bloquea la edición de sus registros (RF24).",
+      "columnas": [
+        {
+          "columna": "id_cierre",
+          "tipo": "integer",
+          "nulo": false,
+          "por_defecto": "nextval('sirdepa.cierre_diario_id_cierre_seq'::regclass)",
+          "pk": true,
+          "unico": false,
+          "descripcion": "Identificador del cierre"
+        },
+        {
+          "columna": "id_lugar",
+          "tipo": "integer",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "fk": {
+            "tabla": "lugar_desembarque",
+            "columna": "id_lugar"
+          },
+          "descripcion": "Lugar de desembarque"
+        },
+        {
+          "columna": "fecha",
+          "tipo": "date",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Día cerrado"
+        },
+        {
+          "columna": "kg_registrados",
+          "tipo": "numeric(12,2)",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Kilos registrados en el día"
+        },
+        {
+          "columna": "kg_despachados",
+          "tipo": "numeric(12,2)",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "descripcion": "Kilos despachados en lotes"
+        },
+        {
+          "columna": "cerrado_por",
+          "tipo": "uuid",
+          "nulo": false,
+          "pk": false,
+          "unico": false,
+          "fk": {
+            "tabla": "usuario",
+            "columna": "id_usuario"
+          },
+          "descripcion": "Usuario que cerró el día"
+        },
+        {
+          "columna": "cerrado_en",
+          "tipo": "timestamp with time zone",
+          "nulo": false,
+          "por_defecto": "now()",
+          "pk": false,
+          "unico": false,
+          "descripcion": "Fecha del cierre"
+        }
+      ],
+      "restricciones": [
+        {
+          "nombre": "cierre_diario_id_lugar_fecha_key",
+          "definicion": "UNIQUE (id_lugar, fecha)"
+        }
+      ]
     },
     {
       "tabla": "auditoria",
-      "descripcion": "Historial de cambios en tablas críticas (quién, qué, cuándo).",
-      "requerimiento": "Seguridad",
+      "descripcion": "Bitácora inmutable de creaciones, ediciones y anulaciones (RF23, RNF10).",
       "columnas": [
         {
-          "columna": "id_aud",
+          "columna": "id_auditoria",
           "tipo": "bigint",
           "nulo": false,
-          "por_defecto": "nextval('sirdepa.auditoria_id_aud_seq'::regclass)",
-          "generada": false,
+          "por_defecto": "nextval('sirdepa.auditoria_id_auditoria_seq'::regclass)",
           "pk": true,
           "unico": false,
           "descripcion": "Identificador del registro de auditoría"
         },
         {
           "columna": "tabla",
-          "tipo": "character varying(60)",
+          "tipo": "character varying(40)",
           "nulo": false,
-          "generada": false,
           "pk": false,
           "unico": false,
           "descripcion": "Tabla afectada"
@@ -1376,16 +1977,14 @@
           "columna": "operacion",
           "tipo": "character(1)",
           "nulo": false,
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Operación: I (insert), U (update), D (delete)"
+          "descripcion": "I (creación), U (edición) o D (eliminación)"
         },
         {
           "columna": "id_registro",
           "tipo": "text",
-          "nulo": true,
-          "generada": false,
+          "nulo": false,
           "pk": false,
           "unico": false,
           "descripcion": "Clave del registro afectado"
@@ -1394,149 +1993,312 @@
           "columna": "datos_antes",
           "tipo": "jsonb",
           "nulo": true,
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Estado del registro antes del cambio (JSON)"
+          "descripcion": "Registro antes del cambio (JSON)"
         },
         {
           "columna": "datos_despues",
           "tipo": "jsonb",
           "nulo": true,
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Estado del registro después del cambio (JSON)"
+          "descripcion": "Registro después del cambio (JSON)"
         },
         {
-          "columna": "usuario_db",
+          "columna": "usuario_app",
           "tipo": "text",
-          "nulo": false,
-          "por_defecto": "CURRENT_USER",
-          "generada": false,
+          "nulo": true,
           "pk": false,
           "unico": false,
-          "descripcion": "Usuario de base de datos que hizo el cambio"
+          "descripcion": "Usuario de la aplicación que hizo el cambio"
         },
         {
           "columna": "fecha",
           "tipo": "timestamp with time zone",
           "nulo": false,
           "por_defecto": "now()",
-          "generada": false,
           "pk": false,
           "unico": false,
-          "descripcion": "Fecha y hora del cambio"
+          "descripcion": "Fecha del cambio"
         }
       ],
       "restricciones": [
-        "CHECK ((operacion = ANY (ARRAY['I'::bpchar, 'U'::bpchar, 'D'::bpchar])))"
+        {
+          "nombre": "auditoria_operacion_check",
+          "definicion": "CHECK ((operacion = ANY (ARRAY['I'::bpchar, 'U'::bpchar, 'D'::bpchar])))"
+        }
       ]
     }
   ],
-  "tipos_enumerados": {
-    "rol_usuario": [
-      "ADMIN",
-      "IMARPE",
-      "PRODUCE",
-      "INSPECTOR",
-      "ARMADOR",
-      "PESCADOR",
-      "INVESTIGADOR"
-    ],
-    "tipo_embarcacion": [
+  "enumeraciones": {
+    "categoria_pesca": [
       "ARTESANAL",
-      "MENOR_ESCALA",
-      "MAYOR_ESCALA"
-    ],
-    "estado_embarcacion": [
-      "ACTIVA",
-      "EN_PUERTO",
-      "SUSPENDIDA",
-      "BAJA"
-    ],
-    "tipo_zona": [
-      "PERMITIDA",
-      "RESTRINGIDA",
-      "RESERVA_MARINA",
-      "VEDA_ESPACIAL"
-    ],
-    "estado_permiso": [
-      "VIGENTE",
-      "VENCIDO",
-      "SUSPENDIDO",
-      "REVOCADO"
+      "MENOR_ESCALA"
     ],
     "estado_validacion": [
-      "PENDIENTE",
       "CONFORME",
-      "OBSERVADA"
+      "OBSERVADO",
+      "NO_CONFORME"
+    ],
+    "estado_registro": [
+      "BORRADOR",
+      "EMITIDO",
+      "ANULADO"
+    ],
+    "origen_registro": [
+      "APP_MOVIL",
+      "PORTAL_WEB"
     ],
     "estado_lote": [
-      "GENERADO",
-      "EN_TRANSITO",
-      "COMERCIALIZADO",
-      "OBSERVADO"
+      "DESPACHADO",
+      "RECIBIDO"
     ],
-    "tipo_alerta": [
-      "ZONA_RESTRINGIDA",
-      "TALLA_MINIMA",
-      "VEDA",
-      "CUOTA_EXCEDIDA",
-      "PERMISO_VENCIDO",
-      "SIN_SENAL_GPS",
-      "METEOROLOGICA"
-    ],
-    "nivel_gravedad": [
-      "BAJA",
-      "MEDIA",
-      "ALTA",
-      "CRITICA"
-    ],
-    "estado_atencion": [
+    "estado_aviso": [
       "PENDIENTE",
-      "EN_REVISION",
-      "ATENDIDA",
-      "DESCARTADA"
+      "ATENDIDO",
+      "CANCELADO"
     ]
   },
   "vistas": [
-    "v_alertas_pendientes",
-    "v_avance_cuota",
-    "v_desembarque_por_especie",
-    "v_trazabilidad_lote",
-    "v_ultima_posicion"
+    {
+      "vista": "v_export_sitrapesca",
+      "descripcion": "Datos con la estructura del módulo de descarga del SITRAPESCA (RF20, RD05)."
+    },
+    {
+      "vista": "v_permisos_por_vencer",
+      "descripcion": "Permisos que vencen en los próximos 30 días (RF22)."
+    },
+    {
+      "vista": "v_reporte_imarpe",
+      "descripcion": "Reporte mensual de captura y esfuerzo para el IMARPE (RF19)."
+    },
+    {
+      "vista": "v_saldo_detalle",
+      "descripcion": "Kilos asignados y saldo pendiente por detalle (RF14)."
+    },
+    {
+      "vista": "v_tablero_diario",
+      "descripcion": "Kilos por día, especie, arte y embarcación, y conformidad (RF18)."
+    },
+    {
+      "vista": "v_verificacion_publica",
+      "descripcion": "Verificación pública por QR sin datos personales; responde VÁLIDA o NO VÁLIDA (RF16)."
+    }
+  ],
+  "funciones": [
+    {
+      "funcion": "anular_desembarque(p_id uuid, p_usuario uuid, p_motivo text)",
+      "descripcion": "Anula con motivo y rol autorizado; queda en auditoría (RF23)."
+    },
+    {
+      "funcion": "contenido_constancia(p_id uuid)",
+      "descripcion": "Texto canónico sobre el que se calcula el hash."
+    },
+    {
+      "funcion": "emitir_constancia(p_id uuid, p_url_base text)",
+      "descripcion": "Genera código, hash SHA-256 y URL del QR; idempotente (RF13)."
+    },
+    {
+      "funcion": "validar_desembarque(p_id uuid)",
+      "descripcion": "Motor de reglas: permiso, especie, arte, veda, talla, zona–arte y bodega; clasifica y alerta (RF10, RF22)."
+    }
   ],
   "triggers": [
     {
-      "nombre": "tg_posicion_zona",
-      "tabla": "posicion_gps",
-      "funcion": "fn_validar_zona_gps",
-      "descripcion": "Marca la posición y crea alerta ZONA_RESTRINGIDA si cae en una zona restringida vigente"
+      "trigger": "tg_auditoria_inmutable",
+      "tabla": "auditoria",
+      "funcion": "fn_auditoria_inmutable",
+      "descripcion": "Impide modificar o borrar la bitácora"
     },
     {
-      "nombre": "tg_detalle_validar",
-      "tabla": "detalle_captura",
-      "funcion": "fn_validar_detalle",
-      "descripcion": "Calcula cumple_talla_minima y crea alertas TALLA_MINIMA o VEDA"
-    },
-    {
-      "nombre": "tg_detalle_total",
-      "tabla": "detalle_captura",
-      "funcion": "fn_recalcular_total",
-      "descripcion": "Mantiene captura.total_kg igual a la suma del detalle"
-    },
-    {
-      "nombre": "tg_captura_permiso",
-      "tabla": "captura",
-      "funcion": "fn_validar_permiso",
-      "descripcion": "Crea alerta PERMISO_VENCIDO si la embarcación no tiene permiso vigente"
-    },
-    {
-      "nombre": "tg_aud_*",
-      "tabla": "embarcacion, permiso, captura, detalle_captura, alerta",
+      "trigger": "tg_aud_desembarque",
+      "tabla": "desembarque",
       "funcion": "fn_auditoria",
-      "descripcion": "Registra cada cambio en la tabla auditoria"
+      "descripcion": "Registra cada cambio en la bitácora"
+    },
+    {
+      "trigger": "tg_cierre_desembarque",
+      "tabla": "desembarque",
+      "funcion": "fn_bloqueo_cierre",
+      "descripcion": "Bloquea la edición de días cerrados"
+    },
+    {
+      "trigger": "tg_aud_detalle",
+      "tabla": "detalle_desembarque",
+      "funcion": "fn_auditoria",
+      "descripcion": "Registra cada cambio en la bitácora"
+    },
+    {
+      "trigger": "tg_cierre_detalle",
+      "tabla": "detalle_desembarque",
+      "funcion": "fn_bloqueo_cierre",
+      "descripcion": "Bloquea la edición de días cerrados"
+    },
+    {
+      "trigger": "tg_aud_embarcacion",
+      "tabla": "embarcacion",
+      "funcion": "fn_auditoria",
+      "descripcion": "Registra cada cambio en la bitácora"
+    },
+    {
+      "trigger": "tg_max_fotos",
+      "tabla": "evidencia_foto",
+      "funcion": "fn_max_fotos",
+      "descripcion": "Máximo 3 fotos por desembarque"
+    },
+    {
+      "trigger": "tg_aud_inspeccion",
+      "tabla": "inspeccion",
+      "funcion": "fn_auditoria",
+      "descripcion": "Registra cada cambio en la bitácora"
+    },
+    {
+      "trigger": "tg_aud_lote",
+      "tabla": "lote_destino",
+      "funcion": "fn_auditoria",
+      "descripcion": "Registra cada cambio en la bitácora"
+    },
+    {
+      "trigger": "tg_saldo_lote",
+      "tabla": "lote_destino",
+      "funcion": "fn_saldo_lote",
+      "descripcion": "La suma de lotes no supera lo desembarcado"
+    },
+    {
+      "trigger": "tg_aud_permiso",
+      "tabla": "permiso_pesca",
+      "funcion": "fn_auditoria",
+      "descripcion": "Registra cada cambio en la bitácora"
+    },
+    {
+      "trigger": "tg_aud_talla",
+      "tabla": "talla_minima",
+      "funcion": "fn_auditoria",
+      "descripcion": "Registra cada cambio en la bitácora"
+    },
+    {
+      "trigger": "tg_aud_veda",
+      "tabla": "veda",
+      "funcion": "fn_auditoria",
+      "descripcion": "Registra cada cambio en la bitácora"
     }
-  ]
+  ],
+  "datos_iniciales": {
+    "parametros": [
+      {
+        "clave": "DIAS_AVISO_PERMISO",
+        "valor": 30,
+        "descripcion": "Días de anticipación para avisar el vencimiento del permiso (RF22)"
+      },
+      {
+        "clave": "KG_POR_M3_BODEGA",
+        "valor": 1000,
+        "descripcion": "Kilos máximos esperados por m³ de bodega (regla CAPACIDAD_BODEGA)"
+      },
+      {
+        "clave": "MAX_FOTOS",
+        "valor": 3,
+        "descripcion": "Fotografías por desembarque (RF11)"
+      },
+      {
+        "clave": "MAX_INTENTOS_LOGIN",
+        "valor": 5,
+        "descripcion": "Intentos fallidos antes del bloqueo (RNF08)"
+      },
+      {
+        "clave": "MAX_KB_FOTO",
+        "valor": 300,
+        "descripcion": "Tamaño máximo de cada foto en KB (RNF05)"
+      },
+      {
+        "clave": "MINUTOS_BLOQUEO",
+        "valor": 15,
+        "descripcion": "Minutos de bloqueo tras superar los intentos (HU02)"
+      }
+    ],
+    "roles": [
+      "REGISTRADOR",
+      "ADMIN_DPA",
+      "ARMADOR",
+      "COMERCIANTE",
+      "FISCALIZADOR",
+      "ANALISTA",
+      "ADMIN_SISTEMA"
+    ],
+    "tallas_minimas": [
+      {
+        "especie": "Anchoveta",
+        "codigo_fao": "VET",
+        "talla_minima_cm": 12.0,
+        "tolerancia_pct": 10.0,
+        "norma": "R.M. 209-2001-PE",
+        "vigente_desde": "2001-06-28",
+        "vigente_hasta": null
+      },
+      {
+        "especie": "Jurel",
+        "codigo_fao": "CJM",
+        "talla_minima_cm": 31.0,
+        "tolerancia_pct": 30.0,
+        "norma": "R.M. 209-2001-PE",
+        "vigente_desde": "2001-06-28",
+        "vigente_hasta": null
+      },
+      {
+        "especie": "Caballa",
+        "codigo_fao": "MAS",
+        "talla_minima_cm": 29.0,
+        "tolerancia_pct": 30.0,
+        "norma": "R.M. 209-2001-PE",
+        "vigente_desde": "2001-06-28",
+        "vigente_hasta": null
+      },
+      {
+        "especie": "Bonito",
+        "codigo_fao": "BEP",
+        "talla_minima_cm": 52.0,
+        "tolerancia_pct": 10.0,
+        "norma": "R.M. 209-2001-PE",
+        "vigente_desde": "2001-06-28",
+        "vigente_hasta": null
+      },
+      {
+        "especie": "Lorna",
+        "codigo_fao": null,
+        "talla_minima_cm": 24.0,
+        "tolerancia_pct": 10.0,
+        "norma": "R.M. 209-2001-PE",
+        "vigente_desde": "2001-06-28",
+        "vigente_hasta": "2025-03-08"
+      },
+      {
+        "especie": "Lorna",
+        "codigo_fao": null,
+        "talla_minima_cm": 21.0,
+        "tolerancia_pct": 25.0,
+        "norma": "R.M. 000109-2025-PRODUCE",
+        "vigente_desde": "2025-03-09",
+        "vigente_hasta": null
+      },
+      {
+        "especie": "Cabrilla",
+        "codigo_fao": null,
+        "talla_minima_cm": 32.0,
+        "tolerancia_pct": 20.0,
+        "norma": "R.M. 209-2001-PE",
+        "vigente_desde": "2001-06-28",
+        "vigente_hasta": "2025-05-30"
+      },
+      {
+        "especie": "Cabrilla",
+        "codigo_fao": null,
+        "talla_minima_cm": 27.0,
+        "tolerancia_pct": 25.0,
+        "norma": "R.M. 000191-2025-PRODUCE",
+        "vigente_desde": "2025-05-31",
+        "vigente_hasta": null
+      }
+    ]
+  }
 }

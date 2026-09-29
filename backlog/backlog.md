@@ -1,244 +1,131 @@
 # Product Backlog - SIRDEPA
 
-Backlog del producto del proyecto **Vida Submarina (ODS 14)**, organizado en épicas, historias de usuario (HU) y tareas técnicas. Cada HU sigue el formato *Como… quiero… para…* e incluye criterios de aceptación y los requerimientos del informe que cubre (RF, RNF, RD).
+Backlog del producto según el informe del proyecto (Capítulo 5). Se gestiona en Jira Software con Scrum y Sprints de dos semanas.
 
-- **Metodología:** Scrum, sprints de 2 semanas
-- **Herramienta:** Jira (importar `jira_import.csv`)
-- **Estimación:** puntos de historia en escala Fibonacci (1, 2, 3, 5, 8, 13)
+> **Objetivo del Producto:** que todo desembarque del DPA piloto quede registrado, validado y con constancia verificable el mismo día en que ocurre.
 
-## Resumen de sprints
-
-| Sprint | Objetivo | Historias | Tareas técnicas | Puntos |
-|---|---|---|---|---|
-| Sprint 1 | Implementar la gestión de flota pesquera y actividades pesqueras | HU01 – HU06 | T01, T02, T03, T04, T05, T07, T08 | 63 |
-| Sprint 2 | Desarrollar la gestión normativa, inteligencia pesquera y medioambiental | HU07 – HU15 | T06, T09, T10 | 61 |
+- **Épicas:** 6 · **Historias de usuario:** 24 · **Puntos totales:** 124
+- **Priorización:** MoSCoW — M (indispensable), S (deseable), C (opcional)
+- **Estimación:** puntos de historia en escala de Fibonacci
+- **Capacidad del equipo:** cerca de 40 puntos por Sprint
 
 ## Épicas
 
-| ID | Épica | Descripción | Historias / tareas |
-|---|---|---|---|
-| EP01 | Gestión de flota pesquera | Registro de embarcaciones y pescadores, y monitoreo satelital de su posición. | HU01, HU02, HU03 |
-| EP02 | Actividades pesqueras | Bitácora digital de capturas, evidencia fotográfica y trazabilidad por lote/QR. | HU04, HU05, HU06 |
-| EP03 | Gestión normativa | Zonas, vedas, tallas mínimas, cuotas y permisos, con alertas automáticas de incumplimiento. | HU07, HU08, HU09, HU10 |
-| EP04 | Inteligencia pesquera | Reportes, dashboards y verificación pública de trazabilidad para la toma de decisiones. | HU11, HU12, HU13 |
-| EP05 | Gestión medioambiental | Datos oceanográficos/meteorológicos e indicadores de sostenibilidad del recurso. | HU14, HU15 |
-| EP06 | Plataforma y seguridad | Base de datos, aplicaciones, autenticación, roles, auditoría y cifrado (habilitadores técnicos). | T01, T02, T03, T04, T05, T06, T07, T08, T09, T10 |
-
-## Sprint 1 - Gestión de flota y actividades pesqueras
-
-### HU01 - Registrar mi embarcación con matrícula, tipo, eslora y capacidad de bodega
-
-**Épica:** EP01 Gestión de flota pesquera · **Prioridad:** Muy alta · **Puntos:** 5 · **Requerimientos:** RF01.3, RD01
-
-> Como **armador**, quiero **registrar mi embarcación con matrícula, tipo, eslora y capacidad de bodega**, para **que quede habilitada para operar y ser monitoreada**.
-
-**Criterios de aceptación**
-
-- [ ] La matrícula es única y obligatoria
-- [ ] Se asocia a un pescador propietario existente
-- [ ] Queda en estado ACTIVA y se registra en auditoría
-
-### HU02 - Registrar pescadores con su DNI, comunidad y contacto
-
-**Épica:** EP01 Gestión de flota pesquera · **Prioridad:** Alta · **Puntos:** 3 · **Requerimientos:** RD01
-
-> Como **administrador**, quiero **registrar pescadores con su DNI, comunidad y contacto**, para **vincularlos como propietarios o tripulantes de embarcaciones**.
-
-**Criterios de aceptación**
-
-- [ ] El documento es único
-- [ ] Se puede vincular a un usuario del sistema
-- [ ] Se valida el formato del DNI (8 dígitos)
-
-### HU03 - Recibir la posición GPS de cada embarcación cada 15 minutos
-
-**Épica:** EP01 Gestión de flota pesquera · **Prioridad:** Muy alta · **Puntos:** 8 · **Requerimientos:** RF01.1, RNF 01.1
-
-> Como **fiscalizador de PRODUCE**, quiero **recibir la posición GPS de cada embarcación cada 15 minutos**, para **conocer en todo momento dónde se está pescando**.
-
-**Criterios de aceptación**
-
-- [ ] Se almacena fecha, latitud, longitud, velocidad y rumbo
-- [ ] Se aceptan envíos en lote cuando no hay señal (sync batch)
-- [ ] No se duplican posiciones para la misma embarcación y hora
-- [ ] La última posición se consulta en menos de 3 s
-
-### HU04 - Registrar mi captura en una bitácora digital indicando especie, kg y talla promedio
-
-**Épica:** EP02 Actividades pesqueras · **Prioridad:** Muy alta · **Puntos:** 8 · **Requerimientos:** RF01.3, RD09
-
-> Como **pescador artesanal**, quiero **registrar mi captura en una bitácora digital indicando especie, kg y talla promedio**, para **cumplir con la declaración sin trámites en papel**.
-
-**Criterios de aceptación**
-
-- [ ] Una captura puede tener varias especies
-- [ ] El total en kg se calcula automáticamente
-- [ ] Funciona desde el celular y guarda offline hasta tener señal
-- [ ] El registro toma menos de 2 minutos
-
-### HU05 - Adjuntar fotos de mi captura
-
-**Épica:** EP02 Actividades pesqueras · **Prioridad:** Media · **Puntos:** 3 · **Requerimientos:** RF01.4
-
-> Como **pescador artesanal**, quiero **adjuntar fotos de mi captura**, para **tener evidencia que respalde lo declarado**.
-
-**Criterios de aceptación**
-
-- [ ] Se aceptan fotos JPG/PNG de hasta 5 MB
-- [ ] Se guarda el hash SHA-256 para garantizar integridad
-- [ ] Se puede adjuntar más de una foto por captura
-
-### HU06 - Que se genere un código QR único por lote de captura
-
-**Épica:** EP02 Actividades pesqueras · **Prioridad:** Alta · **Puntos:** 5 · **Requerimientos:** RF01.5
-
-> Como **armador**, quiero **que se genere un código QR único por lote de captura**, para **certificar el origen legal del producto ante compradores**.
-
-**Criterios de aceptación**
-
-- [ ] El QR contiene un UUID único
-- [ ] Solo se genera si la captura pasó la validación
-- [ ] El QR se puede descargar e imprimir
-
-## Sprint 2 - Gestión normativa, inteligencia pesquera y medioambiental
-
-### HU07 - Definir zonas restringidas y reservas marinas como polígonos en el mapa
-
-**Épica:** EP03 Gestión normativa · **Prioridad:** Muy alta · **Puntos:** 5 · **Requerimientos:** RF01.2, RD01
-
-> Como **analista de PRODUCE**, quiero **definir zonas restringidas y reservas marinas como polígonos en el mapa**, para **que el sistema detecte ingresos no autorizados**.
-
-**Criterios de aceptación**
-
-- [ ] Las zonas tienen tipo, norma legal y vigencia
-- [ ] Se pueden cargar polígonos en formato GeoJSON
-- [ ] Una zona vencida deja de generar alertas
-
-### HU08 - Registrar vedas, tallas mínimas y cuotas por especie
-
-**Épica:** EP03 Gestión normativa · **Prioridad:** Alta · **Puntos:** 5 · **Requerimientos:** RD01, RD17
-
-> Como **investigador de IMARPE**, quiero **registrar vedas, tallas mínimas y cuotas por especie**, para **que las capturas se validen contra la normativa vigente**.
-
-**Criterios de aceptación**
-
-- [ ] Una veda tiene especie, fechas y opcionalmente zona
-- [ ] Cada especie tiene talla mínima y cuota anual
-- [ ] Los cambios quedan en auditoría
-
-### HU09 - Gestionar los permisos de pesca de cada embarcación y las especies autorizadas
-
-**Épica:** EP03 Gestión normativa · **Prioridad:** Alta · **Puntos:** 5 · **Requerimientos:** RD01
-
-> Como **fiscalizador de PRODUCE**, quiero **gestionar los permisos de pesca de cada embarcación y las especies autorizadas**, para **saber quién puede pescar qué y hasta cuándo**.
-
-**Criterios de aceptación**
-
-- [ ] El número de resolución es único
-- [ ] El permiso indica especies autorizadas
-- [ ] Una captura sin permiso vigente genera alerta CRÍTICA
-
-### HU10 - Recibir alertas automáticas de ingreso a zona restringida, talla menor, veda o permiso vencido
-
-**Épica:** EP03 Gestión normativa · **Prioridad:** Muy alta · **Puntos:** 8 · **Requerimientos:** RF01.2, RF01.7
-
-> Como **inspector**, quiero **recibir alertas automáticas de ingreso a zona restringida, talla menor, veda o permiso vencido**, para **actuar rápido ante pesca ilegal**.
-
-**Criterios de aceptación**
-
-- [ ] Cada alerta tiene tipo, gravedad y estado de atención
-- [ ] Se notifica a IMARPE, PRODUCE y al usuario involucrado
-- [ ] El inspector puede marcarla como atendida o descartada
-
-### HU11 - Ver un dashboard con desembarques por período, especie y zona
-
-**Épica:** EP04 Inteligencia pesquera · **Prioridad:** Alta · **Puntos:** 8 · **Requerimientos:** RD17
-
-> Como **analista de IMARPE**, quiero **ver un dashboard con desembarques por período, especie y zona**, para **tomar decisiones sobre vedas y cuotas con datos en tiempo real**.
-
-**Criterios de aceptación**
-
-- [ ] Filtros por rango de fechas, especie y zona
-- [ ] Muestra avance de cuota por especie
-- [ ] Muestra alertas pendientes por gravedad
-
-### HU12 - Exportar los reportes a Excel y PDF
-
-**Épica:** EP04 Inteligencia pesquera · **Prioridad:** Media · **Puntos:** 3 · **Requerimientos:** RD17
-
-> Como **analista de IMARPE**, quiero **exportar los reportes a Excel y PDF**, para **compartirlos en informes oficiales**.
-
-**Criterios de aceptación**
-
-- [ ] El Excel conserva los filtros aplicados
-- [ ] El PDF incluye fecha de generación y usuario
-
-### HU13 - Escanear el QR de un lote y ver su origen
-
-**Épica:** EP04 Inteligencia pesquera · **Prioridad:** Media · **Puntos:** 3 · **Requerimientos:** RF01.5
-
-> Como **consumidor o comprador**, quiero **escanear el QR de un lote y ver su origen**, para **comprobar que el producto proviene de pesca legal**.
-
-**Criterios de aceptación**
-
-- [ ] La consulta no requiere iniciar sesión
-- [ ] Muestra embarcación, fecha, lugar, especie y si cumple talla
-- [ ] No expone datos personales del pescador
-
-### HU14 - Registrar lecturas de sensores (temperatura del agua, oleaje, viento)
-
-**Épica:** EP05 Gestión medioambiental · **Prioridad:** Media · **Puntos:** 5 · **Requerimientos:** RF01.6
-
-> Como **investigador de IMARPE**, quiero **registrar lecturas de sensores (temperatura del agua, oleaje, viento)**, para **relacionar las capturas con las condiciones del mar**.
-
-**Criterios de aceptación**
-
-- [ ] Cada lectura tiene tipo, valor, unidad y hora
-- [ ] Se generan alertas meteorológicas por umbral
-
-### HU15 - Consultar indicadores de sostenibilidad (porcentaje de juveniles, avance de cuota)
-
-**Épica:** EP05 Gestión medioambiental · **Prioridad:** Media · **Puntos:** 5 · **Requerimientos:** RD17
-
-> Como **organización ambiental**, quiero **consultar indicadores de sostenibilidad (porcentaje de juveniles, avance de cuota)**, para **evaluar la salud del recurso**.
-
-**Criterios de aceptación**
-
-- [ ] Se muestra el porcentaje de capturas bajo talla mínima por especie
-- [ ] Se muestra el avance de cuota anual
-- [ ] Los datos son agregados y anónimos
-
-## Tareas técnicas (EP06 - Plataforma y seguridad)
-
-| ID | Tarea | Descripción | Prioridad | Sprint | Puntos |
+| ID | Épica | Objetivo | Historias | Requerimientos | Puntos |
 |---|---|---|---|---|---|
-| T01 | Diseñar esquema de base de datos PostgreSQL | Crear el esquema principal con PostgreSQL 16 y PostGIS (base-de-datos/sirdepa_schema.sql) | Alta | 1 | 5 |
-| T02 | Implementar geolocalización con PostGIS | Integrar PostGIS para capturar y consultar ubicaciones y zonas | Alta | 1 | 3 |
-| T03 | Crear diccionario de datos | Documentar todas las tablas y campos (base-de-datos/diccionario_datos.json) | Media | 1 | 2 |
-| T04 | Diseñar prototipos de UI/UX | Crear diseños visuales para la aplicación web y móvil (docs/prototipos) | Alta | 1 | 5 |
-| T05 | Crear aplicación web | Desarrollar la interfaz web responsiva del sistema SIRDEPA | Alta | 1 | 8 |
-| T06 | Crear aplicación móvil | Desarrollar la aplicación móvil para registro en campo con modo offline | Media | 2 | 8 |
-| T07 | Implementar autenticación de usuarios | Login, sesiones y autenticación de dos factores para usuarios críticos (RNF 01.2) | Alta | 1 | 5 |
-| T08 | Gestión de roles y permisos | Control de acceso por rol: ADMIN, IMARPE, PRODUCE, INSPECTOR, ARMADOR, PESCADOR | Alta | 1 | 3 |
-| T09 | Auditoría de cambios | Registro de todas las modificaciones en tablas críticas | Media | 2 | 3 |
-| T10 | Encriptación de datos | Cifrado en tránsito (HTTPS) y de información sensible en reposo | Alta | 2 | 3 |
+| E1 | Acceso y maestros | Controlar el acceso y registrar embarcaciones, permisos y catálogos. | HU01, HU02, HU03, HU04, HU05 | RF01–RF04 | 21 |
+| E2 | Registro en el muelle | Registrar el desembarque en minutos, incluso sin señal. | HU06, HU07, HU08, HU20, HU22, HU23 | RF05–RF08, RF11, RF12 | 32 |
+| E3 | Validación normativa | Clasificar cada desembarque según las normas vigentes. | HU09, HU10 | RF09, RF10 | 13 |
+| E4 | Constancia y trazabilidad | Emitir constancias verificables y trazar los lotes vendidos. | HU11, HU12, HU13, HU14 | RF13–RF16 | 21 |
+| E5 | Fiscalización y control | Alertar, registrar observaciones y auditar cambios. | HU15, HU21 | RF17, RF22, RF23 | 8 |
+| E6 | Información y reportes | Tablero, reportes, exportación e historial del armador. | HU16, HU17, HU18, HU19, HU24 | RF18–RF21, RF24 | 29 |
 
-## Definición de terminado (DoD)
+## Plan de entregas
 
-- El código está en GitHub, revisado por al menos un integrante (pull request).
-- Cumple todos los criterios de aceptación de la historia.
-- Las validaciones de negocio (zona, talla, veda, permiso) tienen pruebas.
-- La documentación y el diccionario de datos están actualizados.
-- La historia se movió a **Done** en Jira y se mostró en la Sprint Review.
+| Entrega | Objetivo | Historias | Puntos |
+|---|---|---|---|
+| Sprint 1 | Registrar desde el celular un desembarque completo de una embarcación con permiso vigente. | HU01, HU02, HU03, HU04, HU05, HU06, HU07 | 34 |
+| Sprint 2 | Validar automáticamente, emitir la constancia con QR verificable y operar sin conexión. | HU08, HU09, HU10, HU11, HU12, HU13 | 39 |
+| Release 2 | Recepción de lotes, fiscalización, tablero, reportes, SITRAPESCA, historial, aviso de arribo, anulación, balanza, fotos y cierre diario. Se reparte en los Sprints 3 y 4 según la velocidad medida. | HU14, HU15, HU16, HU17, HU18, HU19, HU20, HU21, HU22, HU23, HU24 | 51 |
 
-## Cómo importar a Jira
+Los Sprints 1 y 2 forman el producto mínimo viable (MVP).
 
-1. En Jira: **Configuración del sistema → Sistema externo → Importar desde CSV** (o *Filters → Import issues from CSV* en proyectos de equipo).
-2. Seleccionar `backlog/jira_import.csv` con codificación **UTF-8** y separador **coma**.
-3. Mapear columnas:
-   - `Issue ID` → *Issue Id* y `Parent ID` → *Parent Id* (vincula historias y tareas a su épica)
-   - `Issue Type`, `Summary`, `Description`, `Priority`, `Status` → campos del mismo nombre
-   - las columnas `Labels` (repetidas, una etiqueta por columna) → *Labels*
-   - `Epic Name` → *Epic Name* (solo proyectos gestionados por la empresa)
+## Historias de usuario
+
+| ID | Épica | Historia de usuario | Criterios de aceptación | Pri. | SP | Entrega |
+|---|---|---|---|---|---|---|
+| HU01 | E1 | Como administrador del sistema, quiero registrar usuarios con su rol y DPA asignado, para controlar quién accede a cada función. | Dado un DNI no registrado, cuando creo el usuario, entonces recibe por SMS un PIN temporal.<br>No se permiten DNI duplicados. | M | 3 | Sprint 1 |
+| HU02 | E1 | Como usuario, quiero ingresar con mi DNI, mi PIN y un código por SMS, para acceder sin necesitar correo electrónico. | Dado un DNI y PIN correctos, cuando ingreso el código recibido, entonces accedo según mi rol.<br>Tras 5 intentos fallidos la cuenta se bloquea 15 minutos. | M | 5 | Sprint 1 |
+| HU03 | E1 | Como administrador del DPA, quiero registrar embarcaciones con matrícula, eslora y capacidad de bodega, para que se clasifiquen como artesanales o de menor escala. | Dada una bodega mayor a 32,6 m³, cuando guardo, entonces el sistema rechaza la categoría artesanal.<br>La matrícula es única. | M | 3 | Sprint 1 |
+| HU04 | E1 | Como administrador del DPA, quiero registrar permisos con su vigencia, especies y artes autorizados, para que cada desembarque se valide automáticamente. | Dado un permiso vencido, cuando consulto la embarcación, entonces aparece «sin permiso vigente». | M | 5 | Sprint 1 |
+| HU05 | E1 | Como administrador, quiero mantener especies, tallas mínimas, tolerancias, artes, zonas y vedas con su norma, para actualizar las reglas sin programar. | Dado un cambio de talla mínima, cuando lo registro con su resolución, entonces se aplica a los desembarques posteriores y no a los anteriores. | M | 5 | Sprint 1 |
+| HU06 | E2 | Como registrador del DPA, quiero registrar un desembarque buscando la embarcación por matrícula o nombre, para documentar cada arribo en menos de 3 minutos. | Dada una embarcación registrada, cuando escribo tres caracteres de su matrícula, entonces aparece en la lista.<br>El registro exige zarpe, arribo, zona y arte. | M | 8 | Sprint 1 |
+| HU07 | E2 | Como registrador, quiero agregar varias especies con su peso, presentación y precio en playa, para reflejar la composición real de la descarga. | Dado un peso menor o igual a cero, cuando intento guardar, entonces el sistema lo impide.<br>El total se calcula automáticamente. | M | 5 | Sprint 1 |
+| HU08 | E2 | Como registrador, quiero registrar sin conexión y que el sistema sincronice después, para no detener el trabajo cuando falla la señal. | Dado el modo avión, cuando registro 3 desembarques y luego recupero la señal, entonces llegan los 3 al servidor sin duplicados. | M | 8 | Sprint 2 |
+| HU09 | E3 | Como registrador, quiero que al confirmar se validen permiso, especie, arte y veda, para saber de inmediato si el desembarque es conforme. | Dada una especie en veda, cuando confirmo, entonces el resultado es No conforme e indica el motivo y la norma. | M | 8 | Sprint 2 |
+| HU10 | E3 | Como registrador, quiero registrar un muestreo de tallas, para que el sistema calcule el porcentaje bajo la talla mínima. | Dada una muestra con 14 % bajo la talla y una tolerancia de 10 %, cuando confirmo, entonces el resultado es Observado. | S | 5 | Sprint 2 |
+| HU11 | E4 | Como registrador, quiero emitir una constancia con QR y enviarla por SMS al armador, para que tenga prueba del origen legal de su pesca. | Dado un desembarque validado, cuando emito, entonces se genera un PDF con código único y QR, y el armador recibe el SMS. | M | 8 | Sprint 2 |
+| HU12 | E4 | Como registrador, quiero asignar los kilos de cada especie a uno o más compradores y vehículos, para trazar el destino de la pesca. | La suma asignada no puede superar lo desembarcado.<br>Se muestra el saldo pendiente. | M | 5 | Sprint 2 |
+| HU13 | E4 | Como fiscalizador o comerciante, quiero escanear el QR y ver si la constancia es válida, para verificar la procedencia en segundos. | Dada una constancia anulada o alterada, cuando la escaneo, entonces se muestra «NO VÁLIDA».<br>Respuesta en 2 s o menos. | M | 5 | Sprint 2 |
+| HU14 | E4 | Como comerciante, quiero confirmar la recepción de mi lote, para cerrar la cadena de custodia. | Dado un lote despachado a mi RUC, cuando confirmo, entonces pasa a «Recibido» con fecha y hora. | S | 3 | Release 2 |
+| HU15 | E5 | Como fiscalizador, quiero recibir alertas de desembarques no conformes y registrar observaciones, para priorizar mis inspecciones. | Dado un desembarque No conforme, cuando se emite, entonces aparece en mi bandeja en menos de un minuto. | S | 5 | Release 2 |
+| HU16 | E6 | Como administrador del DPA, quiero un tablero con kilos por día, especie, embarcación y arte, para gestionar el desembarcadero con datos. | Los filtros por fecha y especie actualizan los indicadores en 5 s o menos. | S | 8 | Release 2 |
+| HU17 | E6 | Como analista del IMARPE, quiero exportar los desembarques del mes con captura y esfuerzo, para incorporarlos a mis análisis. | El archivo CSV o Excel incluye embarcación, arte, zona, días de pesca, especie y kilos. | S | 5 | Release 2 |
+| HU18 | E6 | Como analista de PRODUCE, quiero exportar los datos con la estructura del módulo de descarga del SITRAPESCA, para evitar la doble digitación. | El archivo contiene todos los campos exigidos en el RD05. | S | 8 | Release 2 |
+| HU19 | E6 | Como armador, quiero consultar mi historial y descargar mis constancias, para demostrar mi esfuerzo pesquero. | Solo veo los desembarques de mis embarcaciones. | S | 5 | Release 2 |
+| HU20 | E2 | Como patrón, quiero enviar un aviso de arribo desde mi celular, para agilizar la atención en el muelle. | El aviso aparece en la lista del registrador del DPA indicado. | S | 3 | Release 2 |
+| HU21 | E5 | Como administrador del DPA, quiero anular un desembarque indicando el motivo, para corregir errores sin perder la trazabilidad. | La anulación exige motivo, queda en la auditoría y el QR responde «NO VÁLIDA». | S | 3 | Release 2 |
+| HU22 | E2 | Como registrador, quiero leer el peso desde una balanza digital, para evitar errores de digitación. | Dada una balanza emparejada, cuando pulso «Leer balanza», entonces el peso se completa solo. | C | 5 | Release 2 |
+| HU23 | E2 | Como registrador, quiero adjuntar fotos de la descarga, para contar con evidencia. | Máximo 3 fotos de hasta 300 KB cada una, guardadas con su hash. | S | 3 | Release 2 |
+| HU24 | E6 | Como administrador del DPA, quiero realizar el cierre diario, para cuadrar los kilos registrados y despachados. | El cierre muestra las diferencias por especie y bloquea la edición de los registros del día. | C | 3 | Release 2 |
+
+## Sprint Backlog del Sprint 1
+
+- **Duración:** 2 semanas ([dd/mm] – [dd/mm/2026])
+- **Incremento esperado:** Acceso con DNI + PIN + OTP; embarcaciones, permisos y catálogos cargados; pantalla de registro con detalle por especie.
+- **Demostración (Sprint Review):** Registro de un desembarque de prueba de principio a fin.
+
+| Tarea | HU | Responsable | Horas |
+|---|---|---|---|
+| Configurar el repositorio, ramas (main, develop, feature) y la integración continua básica | HU01 | [Integrante] | 4 |
+| Crear las tablas de usuarios, roles, embarcaciones y permisos (script SQL) | HU03 | [Integrante] | 6 |
+| Servicio de autenticación con DNI, PIN y OTP (SMS simulado) | HU02 | [Integrante] | 10 |
+| Pantallas de administración de usuarios y embarcaciones | HU01 | [Integrante] | 8 |
+| Registro de permisos con especies y artes autorizados | HU04 | [Integrante] | 8 |
+| Carga inicial del catálogo normativo (especies, artes, cuadrículas, vedas) | HU05 | [Integrante] | 6 |
+| Pantalla móvil «Nuevo desembarque» con búsqueda de embarcación | HU06 | [Integrante] | 12 |
+| Detalle por especie con cálculo del total | HU07 | [Integrante] | 8 |
+| Pruebas de aceptación y preparación de la demostración | HU07 | [Integrante] | 6 |
+| **Total** | | | **68** |
+
+## Sprint Backlog del Sprint 2
+
+- **Duración:** 2 semanas ([dd/mm] – [dd/mm/2026])
+- **Incremento esperado:** Validación normativa con resultados explicados; constancia PDF con QR enviada por SMS; lotes por comprador; verificación pública; modo sin conexión.
+- **Demostración (Sprint Review):** Registro en modo avión, sincronización y verificación del QR desde otro celular.
+
+| Tarea | HU | Responsable | Horas |
+|---|---|---|---|
+| Base de datos local SQLite y cola de sincronización con UUID | HU08 | [Integrante] | 12 |
+| Servicio idempotente POST /desembarques | HU08 | [Integrante] | 6 |
+| Motor de validación (Strategy) con reglas de permiso, especie, arte y veda | HU09 | [Integrante] | 12 |
+| Regla de talla mínima y pantalla de muestreo | HU10 | [Integrante] | 8 |
+| Constancia PDF con QR y hash; envío por SMS | HU11 | [Integrante] | 10 |
+| Asignación de lotes con control de saldo | HU12 | [Integrante] | 6 |
+| Página pública de verificación por QR | HU13 | [Integrante] | 6 |
+| Pruebas de corte de red y pruebas unitarias del motor de reglas | HU09 | [Integrante] | 6 |
+| Sprint Review con personal del DPA piloto y retrospectiva | HU13 | [Integrante] | 4 |
+| **Total** | | | **70** |
+
+## Definición de Listo (DoR)
+
+Una historia entra a un Sprint solo si:
+
+- está redactada como «Como… quiero… para…»;
+- tiene criterios de aceptación verificables;
+- está estimada en puntos;
+- sus dependencias están identificadas;
+- cabe en un Sprint.
+
+## Definición de Terminado (DoD)
+
+Una historia está terminada cuando:
+
+- el código está en GitHub y fue revisado por otro integrante mediante pull request;
+- las pruebas unitarias pasan (≥ 70 % de cobertura en el motor de reglas);
+- el Product Owner verificó los criterios de aceptación;
+- los diagramas y el README se actualizaron;
+- la funcionalidad corre en el entorno de pruebas sin errores críticos.
+
+## Importar a Jira
+
+1. Crear en Jira un proyecto de tipo **Scrum** llamado «SIRDEPA».
+2. Crear los Sprints «SIRDEPA Sprint 1» y «SIRDEPA Sprint 2» en el tablero.
+3. Importar `jira_import.csv` desde **Configuración → Sistema → Importación externa → CSV** (UTF-8, separador coma) y mapear:
+   - `Issue ID` → *Issue Id* y `Parent ID` → *Parent Id* (enlaza historias con épicas y subtareas con historias)
+   - `Issue Type`, `Summary`, `Description`, `Priority` → campos del mismo nombre
+   - `Epic Name` → *Epic Name* (solo en proyectos gestionados por la empresa)
    - `Sprint` → *Sprint* y `Story Points` → *Story point estimate*
-4. Crear antes los sprints "SIRDEPA Sprint 1" y "SIRDEPA Sprint 2" en el tablero Scrum para que las historias se asignen automáticamente.
+   - cada columna `Labels` → *Labels*
+4. Las historias del Release 2 quedan en el backlog, sin Sprint, con la etiqueta `release-2`.
+5. Prioridades: M → High, S → Medium, C → Low (la etiqueta `moscow-M/S/C` conserva la clasificación original).
