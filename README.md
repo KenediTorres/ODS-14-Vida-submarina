@@ -2,7 +2,8 @@
 
 **Sistema de Registro de Desembarque Pesquero Artesanal**
 
-ODS 14: Vida submarina · Tema 1: Registro de desembarque pesquero artesanal
+ODS 14: Vida submarina 
+· Tema 1: Registro de desembarque pesquero artesanal
 
 SIRDEPA es un ecosistema digital (aplicación móvil offline-first, portal web de gestión y servicios en la nube) que registra el desembarque de la pesca artesanal en el muelle en menos de tres minutos, lo valida automáticamente contra la normativa vigente y emite una constancia digital con código QR que acredita el origen legal de la pesca.
 
