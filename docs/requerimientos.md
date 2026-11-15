@@ -144,7 +144,7 @@ Actores externos que son sistemas: **SITRAPESCA** (PRODUCE) y **Pasarela SMS**.
 
 ## 8. Matriz de trazabilidad
 
-Relaciona cada requerimiento funcional con su necesidad, caso de uso, historia de usuario, entrega y el objeto de la base de datos que lo soporta (`base-de-datos/sirdepa_schema.sql`).
+Relaciona cada requerimiento funcional con su necesidad, caso de uso, historia de usuario, entrega y el objeto de la base de datos que lo soporta (`BaseDatos/sirdepa_schema.sql`).
 
 | RF | Necesidad | Caso de uso | Historia | Entrega | Base de datos |
 |---|---|---|---|---|---|
