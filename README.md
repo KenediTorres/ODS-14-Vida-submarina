@@ -53,7 +53,7 @@ En los desembarcaderos y caletas del litoral peruano, el registro del desembarqu
 ├── diagramas/
 │   ├── fuentes/                 # Código de los diagramas (.puml, .dot)
 │   └── png/                     # Figuras exportadas
-├── base-de-datos/
+├── BaseDatos/
 │   ├── sirdepa_schema.sql       # Script completo (capítulo 7 y Anexo B del informe)
 │   ├── scripts/                 # El mismo script dividido en seis partes
 │   ├── sirdepa.dbml             # Modelo para dbdiagram.io
@@ -68,7 +68,7 @@ En los desembarcaderos y caletas del litoral peruano, el registro del desembarqu
 
 ```bash
 createdb sirdepa
-psql -d sirdepa -v ON_ERROR_STOP=1 -f base-de-datos/sirdepa_schema.sql
+psql -d sirdepa -v ON_ERROR_STOP=1 -f BaseDatos/sirdepa_schema.sql
 ```
 
 El script crea el esquema `sirdepa` en PostgreSQL 16 con PostGIS y se puede ejecutar más de una vez. Incluye:
