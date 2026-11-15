@@ -3,7 +3,7 @@
 -- 01_esquema.sql · Modelo físico (PostgreSQL 16 + PostGIS 3)
 -- Crea extensiones, esquema, tipos, 28 tablas del modelo lógico y
 -- 2 tablas técnicas de seguridad (codigo_otp y sesion).
--- Autor: equipo SIRDEPA (2026) · Repositorio: base-de-datos/
+-- Autor: equipo SIRDEPA (2026) · Repositorio: BaseDatos/
 -- =====================================================================
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;      -- gen_random_uuid(), digest()

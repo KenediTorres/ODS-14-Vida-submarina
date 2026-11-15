@@ -4,7 +4,7 @@
   "motor": "PostgreSQL 16 + PostGIS 3",
   "esquema": "sirdepa",
   "version": "3.0.0",
-  "fuente": "base-de-datos/sirdepa_schema.sql",
+  "fuente": "BaseDatos/sirdepa_schema.sql",
   "nota": "Generado automáticamente desde la base de datos cargada con sirdepa_schema.sql (capítulo 7 del informe); las descripciones de columna provienen de los comentarios del script.",
   "resumen": {
     "tablas": 30,
