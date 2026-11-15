@@ -2,13 +2,17 @@
 
 Prototipos navegables de SIRDEPA (Anexo B del informe) usados para validar los requerimientos con el personal del DPA.
 
-Archivos previstos:
+**Prototipo en Figma:** https://www.figma.com/design/YPmckpjhiQCBb0yUMqnayR
 
-- `app.html`: aplicación móvil del registrador y del patrón
-- `web.html`: portal web de gestión y tablero del DPA
-- capturas de cada pantalla en PNG
+El archivo tiene tres páginas:
 
-## Pantallas por prototipar
+- **Sistema de diseño**: colores, tipografía, botones, campos, chips de estado y componentes.
+- **Baja fidelidad**: ocho bocetos (L01–L08) del flujo de registro.
+- **Alta fidelidad**: 10 pantallas de la app móvil (A01–A10), 3 del portal de gestión (W01–W03: tablero, alertas y reportes) y 6 de la web para el patrón, el comprador y la verificación pública (W04–W09), enlazadas como prototipo navegable.
+
+Para recorrerlo, abrir el archivo y pulsar *Present* en la página de alta fidelidad; los flujos empiezan en A01, W01, W04 y W07.
+
+## Pantallas prototipadas
 
 | Plataforma | Pantalla | Historias |
 |---|---|---|
