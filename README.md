@@ -49,12 +49,13 @@ En los desembarcaderos y caletas del litoral peruano, el registro del desembarqu
 ├── README.md
 ├── docs/
 │   ├── requerimientos.md        # RF, RNF, RD, casos de uso y matriz de trazabilidad
-│   └── prototipos/              # Prototipos navegables (app.html, web.html) y capturas
+│   └── prototipos/              # Enlace al prototipo en Figma y lista de pantallas
 ├── diagramas/
 │   ├── fuentes/                 # Código de los diagramas (.puml, .dot)
 │   └── png/                     # Figuras exportadas
 ├── base-de-datos/
-│   ├── sirdepa_schema.sql       # PostgreSQL 16 + PostGIS
+│   ├── sirdepa_schema.sql       # Script completo (capítulo 7 y Anexo B del informe)
+│   ├── scripts/                 # El mismo script dividido en seis partes
 │   ├── sirdepa.dbml             # Modelo para dbdiagram.io
 │   └── diccionario_datos.json   # Diccionario de datos
 ├── backlog/
@@ -67,13 +68,30 @@ En los desembarcaderos y caletas del litoral peruano, el registro del desembarqu
 
 ```bash
 createdb sirdepa
-psql -d sirdepa -f base-de-datos/sirdepa_schema.sql
+psql -d sirdepa -v ON_ERROR_STOP=1 -f base-de-datos/sirdepa_schema.sql
 ```
 
-El script crea el esquema `sirdepa` en PostgreSQL 16 con PostGIS: 27 tablas, el motor de validación normativa (`validar_desembarque`), la emisión de constancias con hash SHA-256 (`emitir_constancia`), la anulación auditada, una bitácora inmutable y vistas para el tablero, el reporte del IMARPE y la exportación al SITRAPESCA.
+El script crea el esquema `sirdepa` en PostgreSQL 16 con PostGIS y se puede ejecutar más de una vez. Incluye:
+
+- **30 tablas** en 3FN/4FN, con 15 enumeraciones y 130 restricciones con nombre (PK, FK, UNIQUE, CHECK y exclusión).
+- **13 funciones y procedimientos**: `fn_registrar_desembarque` (registro idempotente desde el celular), `sp_guardar_validacion` (resultado de las cinco reglas), `fn_emitir_constancia` (código, QR y hash SHA-256), `sp_asignar_lote`, `sp_cerrar_dia` y `fn_verificar` (verificación pública por QR).
+- **16 triggers** para la auditoría inmutable, las alertas al fiscalizador, el límite de tres fotos y el control de saldo de los lotes.
+- **3 vistas y 1 vista materializada**: verificación pública, avance de cuotas, exportación al SITRAPESCA y tablero diario.
+- **72 índices**: `CLUSTER` en `desembarque` y `detalle_desembarque`, y non-clustered B-tree, parciales, de cobertura, BRIN y GiST.
+- **Seguridad**: cinco roles con privilegio mínimo y seguridad por filas (RLS) en `desembarque`.
+- **Datos de prueba y pruebas** que comprueban el registro, la validación, la constancia y la verificación.
+
+| Archivo en `scripts/` | Contenido |
+|---|---|
+| `01_esquema.sql` | Tipos, tablas y restricciones |
+| `02_programacion.sql` | Funciones, procedimientos, triggers y vistas |
+| `03_indices.sql` | Índices clustered y non-clustered |
+| `04_seguridad.sql` | Roles, permisos y RLS |
+| `05_datos_prueba.sql` | Catálogos y datos de ejemplo |
+| `06_pruebas.sql` | Pruebas del flujo completo |
 
 - El **desembarque** es la entidad central; su UUID lo genera el celular y sirve de clave de idempotencia para sincronizar sin duplicados.
-- Las **tallas mínimas tienen vigencia**, así que un cambio normativo (como los de 2025 para lorna y cabrilla) solo afecta a los desembarques posteriores.
+- Las **tallas mínimas tienen vigencia**, así que un cambio normativo solo afecta a los desembarques posteriores.
 - Se guarda el **resultado de cada regla**, no solo el estado final, para que el fiscalizador vea el motivo exacto.
 
 Para ver el modelo, pegar `sirdepa.dbml` en [dbdiagram.io](https://dbdiagram.io). El DBML y el diccionario de datos se generan desde el script SQL, que es la fuente única.
@@ -92,4 +110,4 @@ Detalle en [backlog/backlog.md](backlog/backlog.md).
 
 ## Herramientas
 
-Jira Software · GitHub · PlantUML · Graphviz · dbdiagram.io · Draw.io · PostgreSQL + PostGIS
+Jira Software · GitHub · Figma · PlantUML · Graphviz · dbdiagram.io · Draw.io · PostgreSQL + PostGIS
