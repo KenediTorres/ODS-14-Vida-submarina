@@ -44,25 +44,43 @@ En los desembarcaderos y caletas del litoral peruano, el registro del desembarqu
 
 ## Estructura del repositorio
 
+El repositorio sigue las seis carpetas de la guía del informe final (capítulo 11).
+
 ```
 .
 ├── README.md
-├── docs/
-│   ├── requerimientos.md        # RF, RNF, RD, casos de uso y matriz de trazabilidad
-│   └── prototipos/              # Enlace al prototipo en Figma y lista de pantallas
-├── diagramas/
-│   ├── fuentes/                 # Código de los diagramas (.puml, .dot)
-│   └── png/                     # Figuras exportadas
+├── CONTRIBUTING.md                 # Cómo trabajamos: issue → rama → pull request → merge
+├── Documentacion/
+│   ├── requerimientos.md           # RF, RNF, RD y casos de uso (capítulo 2)
+│   └── borradores-v1.0/            # Primera y segunda versión del informe de las Unidades I y II
+├── Modelos/
+│   ├── Diagramas actualizados/     # Contexto, casos de uso, BPMN AS-IS y TO-BE, secuencia
+│   ├── fuentes/                    # Casos de uso, clases, entidad-relación y secuencia
+│   └── png/                        # Figuras exportadas
 ├── BaseDatos/
-│   ├── sirdepa_schema.sql       # Script completo (capítulo 7 y Anexo B del informe)
-│   ├── scripts/                 # El mismo script dividido en seis partes
-│   ├── sirdepa.dbml             # Modelo para dbdiagram.io
-│   └── diccionario_datos.json   # Diccionario de datos
-├── backlog/
-│   ├── backlog.md               # Épicas, historias de usuario y Sprints
-│   └── jira_import.csv          # Backlog para importar en Jira
+│   ├── sirdepa_schema.sql          # Script completo (capítulo 7 y Anexo B del informe)
+│   ├── scripts/                    # El mismo script dividido en seis partes
+│   ├── sirdepa.dbml                # Modelo para dbdiagram.io
+│   └── diccionario_datos.json      # Diccionario de datos
+├── Prototipo/
+│   └── README.md                   # Enlace al Figma y lista de pantallas (capítulo 9)
+├── Trazabilidad/
+│   ├── matriz_trazabilidad.md      # RF, necesidad, caso de uso, historia y Sprint; pantallas y RF
+│   ├── backlog.md                  # Épicas, historias de usuario, Sprints y responsables
+│   └── jira_import.csv             # Importación inicial a Jira
+├── VersionesFinales/
+│   └── Informe_SIRDEPA_v1.0.pdf    # Entrega de las Unidades I y II
 └── .gitignore
 ```
+
+| Carpeta | Contenido | Capítulos del informe |
+|---|---|---|
+| `Documentacion/` | Informe técnico, requerimientos y guía de uso del repositorio | 1, 2 y 5 |
+| `Modelos/` | Diagramas de contexto, casos de uso, procesos, datos, clases, secuencia, componentes y despliegue | 3, 4, 6 y 8 |
+| `BaseDatos/` | Script SQL, modelo DBML y diccionario de datos | 7 y Anexo B |
+| `Prototipo/` | Enlace al Figma, capturas de baja y alta fidelidad y mapas de navegación | 9 |
+| `Trazabilidad/` | Matriz de trazabilidad, backlog y relación entre pantallas y requerimientos | 2, 5 y 9 |
+| `VersionesFinales/` | Versiones cerradas del informe: v1.0, v2.0 y vFinal | 11.3 |
 
 ## Base de datos
 
@@ -98,15 +116,31 @@ Para ver el modelo, pegar `sirdepa.dbml` en [dbdiagram.io](https://dbdiagram.io)
 
 ## Metodología
 
-**Scrum** con Sprints de dos semanas, gestionado en Jira. El backlog tiene 6 épicas y 24 historias de usuario (124 puntos).
+**Scrum** con Sprints de dos semanas, gestionado en Jira Software (proyecto ODS14). El backlog tiene 6 épicas y 25 historias de usuario (128 puntos).
 
-| Entrega | Objetivo | Historias | Puntos |
+| Sprint | Fechas | Objetivo | Historias | Puntos |
+|---|---|---|---|---|
+| Sprint 1 | 25 sep – 09 oct | Registrar desde el celular un desembarque completo de una embarcación con permiso vigente | HU01 – HU07, HU20, HU23 | 40 |
+| Sprint 2 | 09 oct – 23 oct | Validar automáticamente, emitir constancias, asignar lotes y operar sin conexión | HU08 – HU13, HU21 | 42 |
+| Sprint 3 | 23 oct – 06 nov | Cerrar la trazabilidad e informar a las autoridades | HU14 – HU19, HU24, HU25 (+HU22) | 41 (+5) |
+
+Detalle en [Trazabilidad/backlog.md](Trazabilidad/backlog.md) y [Trazabilidad/matriz_trazabilidad.md](Trazabilidad/matriz_trazabilidad.md).
+
+## Versiones del informe
+
+Cada entrega se guarda en `VersionesFinales/` y se marca con una etiqueta (tag) de GitHub.
+
+| Versión | Fecha | Contenido | Etiqueta |
 |---|---|---|---|
-| Sprint 1 | Registrar desde el celular un desembarque completo de una embarcación con permiso vigente | HU01 – HU07 | 34 |
-| Sprint 2 | Validar automáticamente, emitir la constancia con QR verificable y operar sin conexión | HU08 – HU13 | 39 |
-| Release 2 | Fiscalización, reportes, SITRAPESCA, historial, balanza, fotos y cierre diario | HU14 – HU24 | 51 |
+| v1.0 | 29/09/2026 | Unidades I y II: capítulos 1 a 5 | `v1.0` |
+| v2.0 | 15/11/2026 | Unidades III y IV: capítulos 6 a 9 | `v2.0` |
+| vFinal | Pendiente | Informe final: capítulo 11, conclusiones, anexos y levantamiento de observaciones | `vFinal` |
 
-Detalle en [backlog/backlog.md](backlog/backlog.md).
+## Cómo colaborar
+
+Cada integrante trabaja en su propia rama y lleva sus cambios a `main` con un pull request. Los pasos, las ramas y las tareas de cada uno están en [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Prototipo navegable en Figma: https://www.figma.com/design/YPmckpjhiQCBb0yUMqnayR
 
 ## Herramientas
 
